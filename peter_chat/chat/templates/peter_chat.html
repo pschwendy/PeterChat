@@ -167,17 +167,17 @@
 		        chatSocket.onmessage = function(msg){
 							const message = JSON.parse(msg.data);
 							//const _id = JSON.parse(id.data);
-							if(message.id == chatSocket.id) {
-								msgHtml = '<div class="message-row sent-message">\
+							//if(message.id == chatSocket.id) {
+							msgHtml = '<div class="message-row sent-message">\
 									<div class="message-content">\
 									<div class="message-text">'
-							}
-							else{
-								msgHtml = '<div class="message-row received-message">\
+							//}
+							//else{
+								/*msgHtml = '<div class="message-row received-message">\
 									<div class="message-content">\
 										<img src="th.jpg" alt="Katya Schwendeman" class="profile-pic">\
-										<div class="message-text">'
-							}
+										<div class="message-text">'*/
+							//}
 							/*msgHtml = '<div class="message-row sent-message">\
 								<div class="message-content">\
 								<div class="message-text">'*/
