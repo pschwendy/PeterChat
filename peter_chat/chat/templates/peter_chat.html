@@ -4,7 +4,6 @@
 	<head>
 		<script src="https://code.jquery.com/jquery-git.js"></script>
 		<meta charset="utf-8" />
-		<script src="/socket.io/socket.io.js"></script>
 		<title>PeterChat</title>
 		<link rel="stylesheet" type="text/css" media="screen" href="{% static 'chat_style.css' %}"/>
 		<link href="server.js"/>
@@ -138,45 +137,66 @@
 					<form id="send" action="">
 						<input type="text" autocomplete="off" id="newmessage" placeholder="Send a message">
 					</form>
+					{{ room_name|json_script:"room-name" }}
 					<script>
-						$(function () {
-			        var socket = io();
-							var msgHtml = '';
-							var msgHtmlEnd = '</div>'
-							var timeHtml = '<div class="message-time">'
-							var timeHtmlEng = '</div>'
-							var containerEnd = '</div>\
-								</div>'
-			        $('#send').submit(function(){
-			          socket.emit('sendMessage', $('#newmessage').val());
-			          $('#newmessage').val('');
-			          return false;
-			        });
-			        socket.on('sendMessage', function(msg, id){
-								if(id == socket.id) {
-									msgHtml = '<div class="message-row sent-message">\
-										<div class="message-content">\
+						//$(function () {
+						const roomName = JSON.parse(document.getElementById('room-name').textContent);
+						const chatSocket = new WebSocket(
+							'ws://'
+							+ window.location.host
+							+ '/ws/chat/'
+							+ roomName
+							+ '/'
+						);
+						var msgHtml = '';
+						var msgHtmlEnd = '</div>'
+						var timeHtml = '<div class="message-time">'
+						var timeHtmlEng = '</div>'
+						var containerEnd = '</div>\
+							</div>'
+						//const chatSocket = new WebSocket('ws://' + window.localation.host '/chat/');
+
+		        $('#send').submit(function(){
+							const msg = $('#newmessage').val();
+							chatSocket.send(JSON.stringify({
+                'message': msg,
+            	}));
+		          $('#newmessage').val('');
+		          return false;
+		        });
+		        chatSocket.onmessage = function(msg){
+							const message = JSON.parse(msg.data);
+							//const _id = JSON.parse(id.data);
+							if(message.id == chatSocket.id) {
+								msgHtml = '<div class="message-row sent-message">\
+									<div class="message-content">\
+									<div class="message-text">'
+							}
+							else{
+								msgHtml = '<div class="message-row received-message">\
+									<div class="message-content">\
+										<img src="th.jpg" alt="Katya Schwendeman" class="profile-pic">\
 										<div class="message-text">'
-								}
-								else{
-									msgHtml = '<div class="message-row received-message">\
-										<div class="message-content">\
-											<img src="th.jpg" alt="Katya Schwendeman" class="profile-pic">\
-											<div class="message-text">'
-								}
-								if(msg.indexOf("/shrug") != -1) {
-									msg = "¯\\_(ツ)_/¯";
-								} else if (msg.indexOf("/facepalm") != -1){
-									msg = "(—‸ლ)";
-								}
-								var endOfContainer = '';
-								//var today = new Date();
-								//var time = today.getHours() + ":" + today.getMinutes();
-								endOfContainer = timeHtml + timeHtml + timeHtmlEng + containerEnd;
-			          $('#conversation').prepend(msgHtml + msg + msgHtmlEnd + endOfContainer);
-								$('#recent-message').text(msg);
-			        });
-			      });
+							}
+							/*msgHtml = '<div class="message-row sent-message">\
+								<div class="message-content">\
+								<div class="message-text">'*/
+							/*if(message.indexOf("/shrug") != -1) {
+								message = "¯\\_(ツ)_/¯";
+							} else if (message.indexOf("/facepalm") != -1){
+								message = "(—‸ლ)";
+							}*/
+							var endOfContainer = '';
+							//var today = new Date();
+							//var time = today.getHours() + ":" + today.getMinutes();
+							endOfContainer = timeHtml + timeHtml + timeHtmlEng + containerEnd;
+		          $('#conversation').prepend(msgHtml + message.message + msgHtmlEnd + endOfContainer);
+							$('#recent-message').text(message.message);
+		        };
+						chatSocket.onclose = function(e) {
+          		console.log('Chat socket closed unexpectedly');
+      			};
+			      //});
 					</script>
 				</div>
 			</div>
