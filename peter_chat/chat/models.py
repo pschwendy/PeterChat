@@ -20,34 +20,35 @@ class User(models.Model):
     #chats = models.ManyToManyField(UserChat)
     friends = models.ManyToManyField('self')
 
-    def __status__(self):
-        return self.Status.label
-
-    def __username__(self):
+    def __str__(self):
         return self.username
 
-    def __name__(self):
+    def get_status(self):
+        return self.Status.label
+
+    def get_name(self):
         return self.first_name + " " + self.last_name
 
 
 # Message model
 class Message(models.Model):
+    sender = models.ForeignKey(User, on_delete = models.CASCADE)
     content = models.TextField()
     image = models.ImageField(upload_to='message_images/', blank=True)
-    sender = models.IntegerField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
 # Chat model
 class Chat(models.Model):
-    participates = models.ManyToManyField(User, related_name='chats')
+    participants = models.ManyToManyField(User, through='Participant')
     messages = models.ManyToManyField(Message, blank=True)
     private = models.BooleanField(default=True)
 
     def __str__(self):
         return "{}".format(self.pk)
-'''
-# Model for a user reference to a chat
-class UserChat(models.Model):
+
+# Model governing user relationship to a chat
+class Participant(models.Model):
+    user = models.ForeignKey(User, on_delete = models.CASCADE)
     chat = models.ForeignKey(Chat, on_delete = models.CASCADE)
-    notifications = BooleanField(default=True)
-    favorite = BooleanField(default=False)'''
+    notifications = models.BooleanField(default=True)
+    favorite = models.BooleanField(default=False)
