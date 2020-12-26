@@ -1,0 +1,49 @@
+#hero{
+    position: relative;
+    filter: brightness(60%);
+}
+
+.hero-nav{
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.topnav{
+    overflow: hidden;
+}
+
+.heading{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.title{
+    color: white;
+    font-size: 48px;
+}
+
+#description{
+    color: white;
+}
+.labeler{
+    font-size: 20px;
+    margin: 4px 8px 8px 4px;
+}
+
+.text-input{
+    width: 100%;
+    margin: 0px 8px 8px 4px;
+}
+
+.reserve{
+    margin: 16px 0px 0px 4px;
+    display: grid;
+    align-items: center;
+    font-size: 1.2rem;
+    width: 100%;
+    /*border-bottom: 1px solid goldenrod;*/
+}
