@@ -2,7 +2,7 @@ from django.db import models
 
 # User model
 class User(models.Model):
-    username = models.CharField(max_length=20, primary_key=True)
+    username = models.CharField(max_length=20)
     password = models.CharField(max_length=30)
     first_name = models.CharField(max_length=32)
     last_name = models.CharField(max_length=40)
@@ -17,7 +17,6 @@ class User(models.Model):
         default=Status.ACTIVE,
     )
     profile_picture = models.ImageField(upload_to='profile_pictures/')
-    #chats = models.ManyToManyField(UserChat)
     friends = models.ManyToManyField('self')
 
     def __str__(self):
