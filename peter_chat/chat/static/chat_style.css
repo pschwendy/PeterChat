@@ -43,7 +43,7 @@ html{
 }
 
 #search-box input{
-	height: 20px;
+	height: auto;
 	width: 86%;
 	margin-left: 6%;
 }
@@ -219,4 +219,40 @@ html{
 
 #message input:focus{
 	outline: none;
+}
+
+#search-for{
+	display: grid;
+	align-items: center;
+	border-radius: 10px 10px 10px 10px;
+	border: none;
+	background-color:whitesmoke;
+	width: auto;
+	height: 50px;
+	margin: 10px 10px 0px 10px;
+	padding: 0 20px;
+	font-size: 1.2rem;
+}
+
+#search-for:focus{
+	outline: none;
+}
+
+#group-chat{
+	display: grid;
+	align-items: center;
+	border-radius: 10px 10px 10px 10px;
+	border: none;
+	background-color:whitesmoke;
+	width: auto;
+	height: 30px;
+	margin: 0 10px 0px 10px;
+	padding: 0 20px;
+	font-size: 1.2rem;
+	text-align: left;
+}
+
+.searches{
+	height: 250px;
+	overflow-y: scroll;
 }

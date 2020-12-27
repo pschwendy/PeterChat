@@ -1,17 +1,14 @@
 from .models import User, Message, Chat, Participant
+from channels.db import database_sync_to_async
+from asgiref.sync import async_to_sync
 
-def signup(username_in, password_in, first_name_in, last_name_in):
-    user = User.objects.create(
-        username=username_in,
-        password=password_in,
-        first_name=first_name_in,
-        last_name=last_name_in,
-    )
+def signup(form):
+    form.save()
 
 def login(username_in, password_in):
     account = User.objects.filter(username = username_in, password = password_in)
     if account.exists():
-        return account
+        return True
     return False
 
 def add_chat(participants_in):
@@ -31,3 +28,9 @@ def send_message(current_chat, user, msg, img, time):
     )
     current_chat.messages.add(message)
     current_chat.save()
+
+@database_sync_to_async
+def search_userbase(username):
+    print("searching...")
+    for user in User.objects.filter(username__contains=username):
+        print(user.username)

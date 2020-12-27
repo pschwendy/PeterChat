@@ -38,7 +38,7 @@ class Message(models.Model):
 
 # Chat model
 class Chat(models.Model):
-    participants = models.ManyToManyField(User, through='Participant')
+    participants = models.ManyToManyField(User, related_name='chats', through='Participant')
     messages = models.ManyToManyField(Message, blank=True)
     private = models.BooleanField(default=True)
 

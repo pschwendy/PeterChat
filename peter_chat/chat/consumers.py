@@ -1,7 +1,8 @@
 import json
 #from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
-
+from .queries import search_userbase
+from channels.db import database_sync_to_async
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -25,18 +26,24 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     # Receive message from WebSocket
     async def receive(self, text_data):
-        msg_json = json.loads(text_data)
+        data_json = json.loads(text_data)
         #print(json.loads(text_data))
-        message = msg_json['message']
+        if data_json['search'] == False:
+            message = data_json['message']
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': message,
+                }
+            )
+        else:
+            searched = data_json['username_searched']
+            await search_userbase(searched)
+            print("done")
         #print(message)
         # Send message to room group
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'message': message,
-            }
-        )
+        
 
     # Receive message from room group
     async def chat_message(self, event):

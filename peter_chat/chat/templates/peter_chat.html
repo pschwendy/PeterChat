@@ -8,197 +8,253 @@
 		<link rel="stylesheet" type="text/css" media="screen" href="{% static 'chat_style.css' %}"/>
 		<link href="server.js"/>
 		<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 	</head>
 	<body>
-			<div id="chat-box">
-				<div id="search-box">
-					<input type="text" placeholder="Find People or Chats">
+		<div id="chat-box">
+			<div id="search-box">
+				<input type="button" value="Find People or Chats" data-toggle="modal" data-target="#find">
+			</div>
+			<div id="chat-list">
+				<!--<div class="chat">
+					<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
+					<div class="chat-name">Katya Schwendeman</div>
+					<div class="recent-message" id="recent-message">LOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONG</div>
+					<div class="message-date">Dec 10</div>
 				</div>
-				<div id="chat-list">
-					<div class="chat">
-						<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
-						<div class="chat-name">Katya Schwendeman</div>
-						<div class="recent-message" id="recent-message">LOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONG</div>
-						<div class="message-date">Dec 10</div>
-					</div>
-					<div class="chat">
-						<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
-						<div class="chat-name">Katya Schwendeman</div>
-						<div class="recent-message">MESSAGEMESSAGEMESSAGEMESSAGE</div>
-						<div class="message-date">Dec 10</div>
-					</div>
-					<div class="chat">
-						<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
-						<div class="chat-name">Katya Schwendeman</div>
-						<div class="recent-message">MESSAGEMESSAGEMESSAGEMESSAGE</div>
-						<div class="message-date">Dec 10</div>
-					</div>
-					<div class="chat">
-						<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
-						<div class="chat-name">Katya Schwendeman</div>
-						<div class="recent-message">MESSAGEMESSAGEMESSAGEMESSAGE</div>
-						<div class="message-date">Dec 10</div>
-					</div>
-					<div class="chat">
-						<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
-						<div class="chat-name">Katya Schwendeman</div>
-						<div class="recent-message">MESSAGEMESSAGEMESSAGEMESSAGE</div>
-						<div class="message-date">Dec 10</div>
-					</div>
-					<div class="chat">
-						<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
-						<div class="chat-name">Katya Schwendeman</div>
-						<div class="recent-message">MESSAGEMESSAGEMESSAGEMESSAGE</div>
-						<div class="message-date">Dec 10</div>
-					</div>
-					<div class="chat">
-						<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
-						<div class="chat-name">Katya Schwendeman</div>
-						<div class="recent-message">MESSAGEMESSAGEMESSAGEMESSAGE</div>
-						<div class="message-date">Dec 10</div>
-					</div>
-					<div class="chat">
-						<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
-						<div class="chat-name">Katya Schwendeman</div>
-						<div class="recent-message">MESSAGEMESSAGEMESSAGEMESSAGE</div>
-						<div class="message-date">Dec 10</div>
-					</div>
-					<div class="chat">
-						<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
-						<div class="chat-name">Katya Schwendeman</div>
-						<div class="recent-message">MESSAGEMESSAGEMESSAGEMESSAGE</div>
-						<div class="message-date">Dec 10</div>
-					</div>
+				<div class="chat">
+					<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
+					<div class="chat-name">Katya Schwendeman</div>
+					<div class="recent-message">MESSAGEMESSAGEMESSAGEMESSAGE</div>
+					<div class="message-date">Dec 10</div>
 				</div>
-				<div id="profile"></div>
-				<div id="chat-title">
-					<div class="row w-100">
-						<div class="col">Katya Schwendeman</div>
-					</div>
+				<div class="chat">
+					<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
+					<div class="chat-name">Katya Schwendeman</div>
+					<div class="recent-message">MESSAGEMESSAGEMESSAGEMESSAGE</div>
+					<div class="message-date">Dec 10</div>
 				</div>
-				<div id="conversation">
-					<div class="message-row sent-message">
-						<div class="message-content">
-							<div id="message-text" class="message-text">LOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONG</div>
-							<div class="message-time">Dec 10</div>
-						</div>
-					</div>
-					<div class="message-row received-message">
-						<div class="message-content">
-							<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
-							<div class="message-text">LOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONG</div>
-							<div class="message-time">Dec 10</div>
-						</div>
-					</div>
-					<div class="message-row sent-message">
-						<div class="message-content">
-							<div class="message-text">LOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONG</div>
-							<div class="message-time">Dec 10</div>
-						</div>
-					</div>
-					<div class="message-row received-message">
-						<div class="message-content">
-							<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
-							<div class="message-text">LOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONG</div>
-							<div class="message-time">Dec 10</div>
-						</div>
-					</div>
-					<div class="message-row sent-message">
-						<div class="message-content">
-							<div class="message-text">LOOOO OOOO OOOO OOOO OOOOO OOOOO OOOO OOOOO OOOOO OOO OO OOO OOOOOO OO OO O OOOO OO OO O OOOOO OOOOO OOOOOO OOOOO OOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOO OOOO OOO OO O O OOOOOOOOO  OOOOO OOOOOO OOOOO ONG</div>
-							<div class="message-time">Dec 10</div>
-						</div>
-					</div>
-					<div class="message-row received-message">
-						<div class="message-content">
-							<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
-							<div class="message-text">LOOOO OOOO OOOO OOOO OOOOO OOOOO OOOO OOOOO OOOOO OOO OO OOO OOOOOO OO OO O OOOO OO OO O OOOOO OOOOO OOOOOO OOOOO OOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOO OOOO OOO OO O O OOOOOOOOO  OOOOO OOOOOO OOOOO ONG</div>
-							<div class="message-time">Dec 10</div>
-						</div>
-					</div>
-					<div class="message-row sent-message">
-						<div class="message-content">
-							<div class="message-text">LOOOO OOOO OOOO OOOO OOOOO OOOOO OOOO OOOOO OOOOO OOO OO OOO OOOOOO OO OO O OOOO OO OO O OOOOO OOOOO OOOOOO OOOOO OOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOO OOOO OOO OO O O OOOOOOOOO  OOOOO OOOOOO OOOOO ONG</div>
-						</div>
-						<div class="message-content">
-							<div class="message-text">LOOOO OOOO OOOO OOOO OOOOO OOOOO OOOO OOOOO OOOOO OOO OO OOO OOOOOO OO OO O OOOO OO OO O OOOOO OOOOO OOOOOO OOOOO OOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOO OOOO OOO OO O O OOOOOOOOO  OOOOO OOOOOO OOOOO ONG</div>
-							<div class="message-time">Dec 10</div>
-						</div>
-					</div>
-					<div class="message-row received-message">
-						<div class="message-content">
-							<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
-							<div class="message-text">LOOOO OOOO OOOO OOOO OOOOO OOOOO OOOO OOOOO OOOOO OOO OO OOO OOOOOO OO OO O OOOO OO OO O OOOOO OOOOO OOOOOO OOOOO OOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOO OOOO OOO OO O O OOOOOOOOO  OOOOO OOOOOO OOOOO ONG</div>
-							<div class="message-time">Dec 10</div>
-						</div>
+				<div class="chat">
+					<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
+					<div class="chat-name">Katya Schwendeman</div>
+					<div class="recent-message">MESSAGEMESSAGEMESSAGEMESSAGE</div>
+					<div class="message-date">Dec 10</div>
+				</div>
+				<div class="chat">
+					<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
+					<div class="chat-name">Katya Schwendeman</div>
+					<div class="recent-message">MESSAGEMESSAGEMESSAGEMESSAGE</div>
+					<div class="message-date">Dec 10</div>
+				</div>
+				<div class="chat">
+					<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
+					<div class="chat-name">Katya Schwendeman</div>
+					<div class="recent-message">MESSAGEMESSAGEMESSAGEMESSAGE</div>
+					<div class="message-date">Dec 10</div>
+				</div>
+				<div class="chat">
+					<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
+					<div class="chat-name">Katya Schwendeman</div>
+					<div class="recent-message">MESSAGEMESSAGEMESSAGEMESSAGE</div>
+					<div class="message-date">Dec 10</div>
+				</div>
+				<div class="chat">
+					<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
+					<div class="chat-name">Katya Schwendeman</div>
+					<div class="recent-message">MESSAGEMESSAGEMESSAGEMESSAGE</div>
+					<div class="message-date">Dec 10</div>
+				</div>
+				<div class="chat">
+					<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
+					<div class="chat-name">Katya Schwendeman</div>
+					<div class="recent-message">MESSAGEMESSAGEMESSAGEMESSAGE</div>
+					<div class="message-date">Dec 10</div>
+				</div>--->
+			</div>
+			<div id="profile"></div>
+			<div id="chat-title">
+				<!--<div class="row w-100">
+					<div class="col">Katya Schwendeman</div>
+				</div>-->
+			</div>
+			<div id="conversation">
+				<!--<div class="message-row sent-message">
+					<div class="message-content">
+						<div id="message-text" class="message-text">LOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONG</div>
+						<div class="message-time">Dec 10</div>
 					</div>
 				</div>
-				<div id="message">
-					<form id="send" action="">
-						<input type="text" autocomplete="off" id="newmessage" placeholder="Send a message">
-					</form>
-					{{ room_name|json_script:"room-name" }}
-					<script>
-						//$(function () {
-						const roomName = JSON.parse(document.getElementById('room-name').textContent);
-						const chatSocket = new WebSocket(
-							'ws://'
-							+ window.location.host
-							+ '/ws/chat/'
-							+ roomName
-							+ '/'
-						);
-						var msgHtml = '';
-						var msgHtmlEnd = '</div>'
-						var timeHtml = '<div class="message-time">'
-						var timeHtmlEng = '</div>'
-						var containerEnd = '</div>\
-							</div>'
-						//const chatSocket = new WebSocket('ws://' + window.localation.host '/chat/');
+				<div class="message-row received-message">
+					<div class="message-content">
+						<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
+						<div class="message-text">LOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONG</div>
+						<div class="message-time">Dec 10</div>
+					</div>
+				</div>
+				<div class="message-row sent-message">
+					<div class="message-content">
+						<div class="message-text">LOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONG</div>
+						<div class="message-time">Dec 10</div>
+					</div>
+				</div>
+				<div class="message-row received-message">
+					<div class="message-content">
+						<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
+						<div class="message-text">LOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONG</div>
+						<div class="message-time">Dec 10</div>
+					</div>
+				</div>
+				<div class="message-row sent-message">
+					<div class="message-content">
+						<div class="message-text">LOOOO OOOO OOOO OOOO OOOOO OOOOO OOOO OOOOO OOOOO OOO OO OOO OOOOOO OO OO O OOOO OO OO O OOOOO OOOOO OOOOOO OOOOO OOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOO OOOO OOO OO O O OOOOOOOOO  OOOOO OOOOOO OOOOO ONG</div>
+						<div class="message-time">Dec 10</div>
+					</div>
+				</div>
+				<div class="message-row received-message">
+					<div class="message-content">
+						<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
+						<div class="message-text">LOOOO OOOO OOOO OOOO OOOOO OOOOO OOOO OOOOO OOOOO OOO OO OOO OOOOOO OO OO O OOOO OO OO O OOOOO OOOOO OOOOOO OOOOO OOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOO OOOO OOO OO O O OOOOOOOOO  OOOOO OOOOOO OOOOO ONG</div>
+						<div class="message-time">Dec 10</div>
+					</div>
+				</div>
+				<div class="message-row sent-message">
+					<div class="message-content">
+						<div class="message-text">LOOOO OOOO OOOO OOOO OOOOO OOOOO OOOO OOOOO OOOOO OOO OO OOO OOOOOO OO OO O OOOO OO OO O OOOOO OOOOO OOOOOO OOOOO OOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOO OOOO OOO OO O O OOOOOOOOO  OOOOO OOOOOO OOOOO ONG</div>
+					</div>
+					<div class="message-content">
+						<div class="message-text">LOOOO OOOO OOOO OOOO OOOOO OOOOO OOOO OOOOO OOOOO OOO OO OOO OOOOOO OO OO O OOOO OO OO O OOOOO OOOOO OOOOOO OOOOO OOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOO OOOO OOO OO O O OOOOOOOOO  OOOOO OOOOOO OOOOO ONG</div>
+						<div class="message-time">Dec 10</div>
+					</div>
+				</div>
+				<div class="message-row received-message">
+					<div class="message-content">
+						<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
+						<div class="message-text">LOOOO OOOO OOOO OOOO OOOOO OOOOO OOOO OOOOO OOOOO OOO OO OOO OOOOOO OO OO O OOOO OO OO O OOOOO OOOOO OOOOOO OOOOO OOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOOO OOOO OOOO OOO OO O O OOOOOOOOO  OOOOO OOOOOO OOOOO ONG</div>
+						<div class="message-time">Dec 10</div>
+					</div>
+				</div>-->
+			</div>
+			<div id="message">
+				<form id="send" action="">
+					<input type="text" autocomplete="off" id="newmessage" placeholder="Send a message">
+				</form>
+				{{ room_name|json_script:"room-name" }}
+				<script>
+					//$(function () {
+					const roomName = JSON.parse(document.getElementById('room-name').textContent);
+					const chatSocket = new WebSocket(
+						'ws://'
+						+ window.location.host
+						+ '/ws/chat/'
+						+ roomName
+						+ '/'
+					);
+					var msgHtml = '';
+					var msgHtmlEnd = '</div>'
+					var timeHtml = '<div class="message-time">'
+					var timeHtmlEng = '</div>'
+					var containerEnd = '</div>\
+						</div>'
+					//const chatSocket = new WebSocket('ws://' + window.localation.host '/chat/');
 
-		        		$('#send').submit(function(){
-							const msg = $('#newmessage').val();
-							chatSocket.send(JSON.stringify({
+					$('#send').submit(function(){
+						const msg = $('#newmessage').val();
+						chatSocket.send(JSON.stringify({
+							'search': false,
 							'message': msg,
-							}));
-							$('#newmessage').val('');
-							return false;
-						});
-		        chatSocket.onmessage = function(msg){
-							const message = JSON.parse(msg.data);
-							//const _id = JSON.parse(id.data);
-							//if(message.id == chatSocket.id) {
-							msgHtml = '<div class="message-row sent-message">\
-									<div class="message-content">\
-									<div class="message-text">'
-							//}
-							//else{
-								/*msgHtml = '<div class="message-row received-message">\
-									<div class="message-content">\
-										<img src="th.jpg" alt="Katya Schwendeman" class="profile-pic">\
-										<div class="message-text">'*/
-							//}
-							/*msgHtml = '<div class="message-row sent-message">\
+						}));
+						$('#newmessage').val('');
+						return false;
+					});
+					chatSocket.onmessage = function(msg){
+						const message = JSON.parse(msg.data);
+						//const _id = JSON.parse(id.data);
+						//if(message.id == chatSocket.id) {
+						msgHtml = '<div class="message-row sent-message">\
 								<div class="message-content">\
-								<div class="message-text">'*/
-							/*if(message.indexOf("/shrug") != -1) {
-								message = "¯\\_(ツ)_/¯";
-							} else if (message.indexOf("/facepalm") != -1){
-								message = "(—‸ლ)";
-							}*/
-							var endOfContainer = '';
-							//var today = new Date();
-							//var time = today.getHours() + ":" + today.getMinutes();
-							endOfContainer = timeHtml + timeHtml + timeHtmlEng + containerEnd;
-		          $('#conversation').prepend(msgHtml + message.message + msgHtmlEnd + endOfContainer);
-							$('#recent-message').text(message.message);
-		        };
-						chatSocket.onclose = function(e) {
-          		console.log('Chat socket closed unexpectedly');
-      			};
-			      //});
+								<div class="message-text">'
+						//}
+						//else{
+							/*msgHtml = '<div class="message-row received-message">\
+								<div class="message-content">\
+									<img src="th.jpg" alt="Katya Schwendeman" class="profile-pic">\
+									<div class="message-text">'*/
+						//}
+						/*msgHtml = '<div class="message-row sent-message">\
+							<div class="message-content">\
+							<div class="message-text">'*/
+						/*if(message.indexOf("/shrug") != -1) {
+							message = "¯\\_(ツ)_/¯";
+						} else if (message.indexOf("/facepalm") != -1){
+							message = "(—‸ლ)";
+						}*/
+						var endOfContainer = '';
+						//var today = new Date();
+						//var time = today.getHours() + ":" + today.getMinutes();
+						endOfContainer = timeHtml + timeHtml + timeHtmlEng + containerEnd;
+						$('#conversation').prepend(msgHtml + message.message + msgHtmlEnd + endOfContainer);
+						$('#recent-message').text(message.message);
+					};
+					chatSocket.onclose = function(e) {
+						console.log('Chat socket closed unexpectedly');
+					};
+				//});
+				</script>
+			</div>
+		</div>
+		<div class="modal fade" id="find" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<input type="text" id="search-for" placeholder="Find People to Chat!">
+					<script>
+						var searchTimeout;
+						document.getElementById('search-for').onkeypress = function () {
+							if (searchTimeout != undefined) clearTimeout(searchTimeout);
+							searchTimeout = setTimeout(callServerScript, 250);
+						};
+						function callServerScript() {
+							var searched = $("#search-for").val();
+							chatSocket.send(JSON.stringify({
+								'search': true,
+								'username_searched': searched
+							}));
+						}
 					</script>
+					<!--<button type="button" id="group-chat">Create a Group Chat</button>-->
+					<div class="modal-body searches">
+						<div class="chat">
+							<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
+							<div class="chat-name">Katya Schwendeman</div>
+							<div class="recent-message">Active Dec 10</div>
+						</div>
+						<div class="chat">
+							<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
+							<div class="chat-name">Katya Schwendeman</div>
+							<div class="recent-message">Active Dec 10</div>
+						</div>
+						<div class="chat">
+							<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
+							<div class="chat-name">Katya Schwendeman</div>
+							<div class="recent-message">Active Dec 10</div>
+						</div>
+						<div class="chat">
+							<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
+							<div class="chat-name">Katya Schwendeman</div>
+							<div class="recent-message">Active Dec 10</div>
+						</div>
+						<div class="chat">
+							<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
+							<div class="chat-name">Katya Schwendeman</div>
+							<div class="recent-message">Active Dec 10</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary">Save changes</button>
+					</div>
 				</div>
 			</div>
+		</div>
 	</body>
 </html>
