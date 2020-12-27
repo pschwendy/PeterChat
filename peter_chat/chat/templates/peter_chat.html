@@ -156,14 +156,14 @@
 							</div>'
 						//const chatSocket = new WebSocket('ws://' + window.localation.host '/chat/');
 
-		        $('#send').submit(function(){
+		        		$('#send').submit(function(){
 							const msg = $('#newmessage').val();
 							chatSocket.send(JSON.stringify({
-                'message': msg,
-            	}));
-		          $('#newmessage').val('');
-		          return false;
-		        });
+							'message': msg,
+							}));
+							$('#newmessage').val('');
+							return false;
+						});
 		        chatSocket.onmessage = function(msg){
 							const message = JSON.parse(msg.data);
 							//const _id = JSON.parse(id.data);

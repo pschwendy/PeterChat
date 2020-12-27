@@ -42,62 +42,79 @@
             
             <hr>
             <div id="login-form">
-              <form>
+              <form name = "login">
+                {% csrf_token %}
                 <div class="labeler">Username</div>
-                <input class="text-input" type="text" placeholder="Username">
+                <input class="text-input" id="username-login" type="text" placeholder="Username">
                 <div class="labeler">Password</div>
-                <input class="text-input" type="password" placeholder="Password">
+                <input class="text-input" id="password-login" type="password" placeholder="Password">
                 <div class="row">
                 </div>
               </form>
               <div class="row">
                 <div class="col reserve">
-                  <button type="button" class="float-right">
+                  <button id="login-button" type="button" class="float-right">
                       Login
                   </button>
                 </div>
               </div>
             </div>
             <div id="signup-form">
-              <form>
+              <form method="POST" name="signup">
+                {% csrf_token %}
                 <div class="labeler">First Name</div>
-                <input class="text-input" type="text" placeholder="First Name">
+                <input class="text-input" id="first-name" type="text" placeholder="First Name" required>
                 <div class="labeler">Last Name</div>
-                <input class="text-input" type="text" placeholder="Last Name">
+                <input class="text-input" id="last-name" type="text" placeholder="Last Name" required>
                 <div class="labeler">Username</div>
-                <input class="text-input" type="text" placeholder="Username">
-                <div class="labeler">Password</div>
-                <input class="text-input" type="password" placeholder="Password">
+                <input class="text-input" id="username-signup" type="text" placeholder="Username" required>
+                <!--<div class="labeler">Password</div>
+                <input class="text-input" id="password-signup" type="password" placeholder="Password" required>
                 <div class="labeler">Confirm Password</div>
-                <input class="text-input" type="password" placeholder="Password">
+                <input class="text-input" id="password-confirm" type="password" placeholder="Password" required>!-->
                 <div class="row">
                 </div>
-              </form>
-              <div class="row">
-                <div class="col reserve">
-                  <button type="button" class="float-right">
-                      Login
-                  </button>
+                <div class="row">
+                  <div class="col reserve">
+                    <button id="signup-button" type="button" class="float-right">
+                        Sign Up
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </div>
+                </div>
+              </form>
         </aside>
         <script>
           $("#signup-form").hide();
           $(function () {
-              $('.toggle-menu').on('click', function(){
-                  $('.toggle-menu').removeClass('selected');
-                  $(this).addClass('selected');
-                  if($(this).is("#login")) {
-                    console.log("logim");
-                    $("#signup-form").hide();
-                    $("#login-form").show();
-                  } else {
-                    console.log("signup");
-                    $("#login-form").hide();
-                    $("#signup-form").show();
-                  }
-              })
+            $('.toggle-menu').on('click', function() {
+              $('.toggle-menu').removeClass('selected');
+              $(this).addClass('selected');
+              if($(this).is("#login")) {
+                console.log("logim");
+                $("#signup-form").hide();
+                $("#login-form").show();
+              } else {
+                console.log("signup");
+                $("#login-form").hide();
+                $("#signup-form").show();
+              }
+            });
+          });
+          $(function() {
+            $('#login-button').on('click', function(){
+              const username = $("#username-login").val();
+              const password = $("#password-login").val();
+              document.login.submit();
+            });
+            $('#signup-button').on('click', function(){
+              const first_name = $("#first-name").val();
+              const last_name = $("#last-name").val();
+              const username = $("#username-signup").val();
+              /*const password = $("#password-signup").val();*/
+              /*const confirm_password = $("#password-confirm").val();*/
+              document.signup.submit();
+            });
           });
         </script>
         <main id="main" class="row">
