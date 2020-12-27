@@ -2,7 +2,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-		<meta charset="utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>PeterChat</title>
     <script src="https://code.jquery.com/jquery-git.js"></script>
     <link rel="stylesheet" type="text/css" media="screen" href="{% static 'main.css' %}"/>
@@ -34,24 +35,71 @@
       <div class="container heading">
         <aside id="reservation-card" class="card float-right" style="width: 24rem;">
           <div class="card-body">
-            <h5 class="card-title">Login</h5>
+            <h5 class="card-title">
+              <input type="button" value="Login" id="login" class="toggle-menu selected">
+              <input type="button" value="Sign Up" id="signup" class="toggle-menu">
+            </h5>
+            
             <hr>
-            <form>
-              <div class="labeler">Username</div>
-              <input class="text-input" type="text" placeholder="Username">
-              <div class="labeler">Password</div>
-              <input class="text-input" type="password" placeholder="Password">
+            <div id="login-form">
+              <form>
+                <div class="labeler">Username</div>
+                <input class="text-input" type="text" placeholder="Username">
+                <div class="labeler">Password</div>
+                <input class="text-input" type="password" placeholder="Password">
+                <div class="row">
+                </div>
+              </form>
               <div class="row">
+                <div class="col reserve">
+                  <button type="button" class="float-right">
+                      Login
+                  </button>
+                </div>
               </div>
-            </form>
-            <div class="row">
-              <div class="col reserve">
-                <button type="button" class="float-right">
-                    Login
-                </button>
             </div>
-          </div>
+            <div id="signup-form">
+              <form>
+                <div class="labeler">First Name</div>
+                <input class="text-input" type="text" placeholder="First Name">
+                <div class="labeler">Last Name</div>
+                <input class="text-input" type="text" placeholder="Last Name">
+                <div class="labeler">Username</div>
+                <input class="text-input" type="text" placeholder="Username">
+                <div class="labeler">Password</div>
+                <input class="text-input" type="password" placeholder="Password">
+                <div class="labeler">Confirm Password</div>
+                <input class="text-input" type="password" placeholder="Password">
+                <div class="row">
+                </div>
+              </form>
+              <div class="row">
+                <div class="col reserve">
+                  <button type="button" class="float-right">
+                      Login
+                  </button>
+                </div>
+              </div>
+            </div>
         </aside>
+        <script>
+          $("#signup-form").hide();
+          $(function () {
+              $('.toggle-menu').on('click', function(){
+                  $('.toggle-menu').removeClass('selected');
+                  $(this).addClass('selected');
+                  if($(this).is("#login")) {
+                    console.log("logim");
+                    $("#signup-form").hide();
+                    $("#login-form").show();
+                  } else {
+                    console.log("signup");
+                    $("#login-form").hide();
+                    $("#signup-form").show();
+                  }
+              })
+          });
+        </script>
         <main id="main" class="row">
           <div class="col m-2">
               <div class="row">

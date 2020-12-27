@@ -1,6 +1,6 @@
 #hero{
     position: relative;
-    filter: brightness(60%);
+    filter: brightness(50%);
 }
 
 .hero-nav{
@@ -46,4 +46,21 @@
     font-size: 1.2rem;
     width: 100%;
     /*border-bottom: 1px solid goldenrod;*/
+}
+
+.toggle-menu{
+    background-color: Transparent;
+    background-repeat: no-repeat;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    outline: none;
+}
+
+.toggle-menu:hover{
+    background: whitesmoke;
+}
+
+.selected{
+    color: blue;
 }
