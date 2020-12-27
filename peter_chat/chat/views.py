@@ -17,6 +17,7 @@ def home(request):
 				password = form.cleaned_data['password']
 				first_name = form.cleaned_data['first_name']
 				last_name = form.cleaned_data['last_name']
+				request.session['username'] = username
 				#signup(username, password, first_name, signup)
 				return HttpResponseRedirect('/chat/room')	
 		elif len(req) == 3:
@@ -24,6 +25,7 @@ def home(request):
 			if form.is_valid():
 				username = form.cleaned_data['username']
 				password = form.cleaned_data['password']
+				request.session['username'] = username
 				#login(username, password)
 				return HttpResponseRedirect('/chat/room')	
 	else:
@@ -31,7 +33,9 @@ def home(request):
 	return render(request, 'index.html', {'form': form})
 
 def chat(request, room_name):
+	username = request.session['username']
 	#return render(request, "peter_chat.html", {})
 	return render(request, 'peter_chat.html', {
-        'room_name': room_name
+        'room_name': room_name,
+		'username': username
     })
