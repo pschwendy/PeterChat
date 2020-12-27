@@ -1,13 +1,31 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
+from . import queries
+
 
 # Create your views here.
-from .forms import UserForm
+from .forms import UserForm, LoginForm
 def home(request):
 	if request.method == 'POST':
-		form = UserForm(request.POST)
-		return HttpResponseRedirect('/chat/room')
+		req = request.POST
+		form = LoginForm(req)
+		if len(req) == 5:
+			form = UserForm(req)
+			if form.is_valid():
+				username = form.cleaned_data['username']
+				password = form.cleaned_data['password']
+				first_name = form.cleaned_data['first_name']
+				last_name = form.cleaned_data['last_name']
+				#signup(username, password, first_name, signup)
+				return HttpResponseRedirect('/chat/room')	
+		elif len(req) == 3:
+			form = LoginForm(req)
+			if form.is_valid():
+				username = form.cleaned_data['username']
+				password = form.cleaned_data['password']
+				#login(username, password)
+				return HttpResponseRedirect('/chat/room')	
 	else:
 		form = UserForm()
 	return render(request, 'index.html', {'form': form})

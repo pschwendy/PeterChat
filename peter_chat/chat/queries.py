@@ -1,4 +1,4 @@
-from models import User, Message, Chat, Participant
+from .models import User, Message, Chat, Participant
 
 def signup(username_in, password_in, first_name_in, last_name_in):
     user = User.objects.create(
@@ -20,10 +20,10 @@ def add_chat(participants_in):
         chat_create.object.update(private=False)
     chat_create.object.participants.add(user_in for user_in in participants_in)
     chat_create.save()
-    participant = Participant.objects.create(user = user_in for user_in in participants_in, chat = chat_create)
+    participant = Participant.objects.create(user = (user_in for user_in in participants_in), chat = chat_create)
 
 def send_message(current_chat, user, msg, img, time):
-     message = Message.objects.create(
+    message = Message.objects.create(
         sender = user,
         content = msg,
         image = img,
