@@ -14,7 +14,7 @@
 	<body>
 		<div id="chat-box">
 			<div id="search-box">
-				<input type="button" value="Find People or Chats" data-toggle="modal" data-target="#find">
+				<input type="button" value="Find People or Chats" data-toggle="modal" data-target="#find" onclick="readySearch()">
 			</div>
 			<div id="chat-list">
 				<!--<div class="chat">
@@ -204,18 +204,32 @@
 				</script>
 			</div>
 		</div>
-		<div class="modal fade" id="find" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+		<div class="modal fade" id="find" tabindex="-1" role="dialog" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered" role="document">
 				<div class="modal-content">
 					<input type="text" id="search-for" placeholder="Find People to Chat!">
 					<script>
+						function readySearch(){
+							$("#search-for").val('');
+							document.getElementById('searches').textContent = '';
+						}
 						var searchTimeout;
 						document.getElementById('search-for').onkeypress = function () {
 							if (searchTimeout != undefined) clearTimeout(searchTimeout);
 							searchTimeout = setTimeout(callServerScript, 250);
 						};
+						document.getElementById('search-for').addEventListener('keydown', function (event) {
+							if (event.keyCode == 8 || event.keyCode == 46) {
+								if (searchTimeout != undefined) clearTimeout(searchTimeout);
+								searchTimeout = setTimeout(callServerScript, 250)
+							}
+						});
 						function callServerScript() {
 							var searched = $("#search-for").val();
+							if(searched == '') {
+								document.getElementById('searches').textContent = '';
+								return;
+							}
 							chatSocket.send(JSON.stringify({
 								'search': true,
 								'username_searched': searched
