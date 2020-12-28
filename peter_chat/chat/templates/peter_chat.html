@@ -225,6 +225,7 @@
 							const user_list = JSON.parse(users.data)
 							console.log(user_list);
 							console.log(user_list.length)
+							document.getElementById('searches').textContent = '';
 							for(var i = 0; i < user_list.length; ++i) {
 								console.log(user_list[i].fields.username)
 								const userHtml = '<div class="chat"> \
