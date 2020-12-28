@@ -160,8 +160,9 @@
 
 					$('#send').submit(function(){
 						const msg = $('#newmessage').val();
+						console.log(msg);
 						chatSocket.send(JSON.stringify({
-							'search': false,
+							'send_type': 'chat_message',
 							'message': msg,
 						}));
 						$('#newmessage').val('');
@@ -169,33 +170,54 @@
 					});
 					chatSocket.onmessage = function(msg){
 						const message = JSON.parse(msg.data);
-						console.log(message)
-						//const _id = JSON.parse(id.data);
-						//if(message.id == chatSocket.id) {
-						msgHtml = '<div class="message-row sent-message">\
+						console.log(message.send_type)
+						if(message.send_type == 'chat') {
+							//const _id = JSON.parse(id.data);
+							//if(message.id == chatSocket.id) {
+							msgHtml = '<div class="message-row sent-message">\
+									<div class="message-content">\
+									<div class="message-text">'
+							//}
+							//else{
+								/*msgHtml = '<div class="message-row received-message">\
+									<div class="message-content">\
+										<img src="th.jpg" alt="Katya Schwendeman" class="profile-pic">\
+										<div class="message-text">'*/
+							//}
+							/*msgHtml = '<div class="message-row sent-message">\
 								<div class="message-content">\
-								<div class="message-text">'
-						//}
-						//else{
-							/*msgHtml = '<div class="message-row received-message">\
-								<div class="message-content">\
-									<img src="th.jpg" alt="Katya Schwendeman" class="profile-pic">\
-									<div class="message-text">'*/
-						//}
-						/*msgHtml = '<div class="message-row sent-message">\
-							<div class="message-content">\
-							<div class="message-text">'*/
-						/*if(message.indexOf("/shrug") != -1) {
-							message = "¯\\_(ツ)_/¯";
-						} else if (message.indexOf("/facepalm") != -1){
-							message = "(—‸ლ)";
-						}*/
-						var endOfContainer = '';
-						//var today = new Date();
-						//var time = today.getHours() + ":" + today.getMinutes();
-						endOfContainer = timeHtml + timeHtml + timeHtmlEng + containerEnd;
-						$('#conversation').prepend(msgHtml + message.message + msgHtmlEnd + endOfContainer);
-						$('#recent-message').text(message.message);
+								<div class="message-text">'*/
+							/*if(message.indexOf("/shrug") != -1) {
+								message = "¯\\_(ツ)_/¯";
+							} else if (message.indexOf("/facepalm") != -1){
+								message = "(—‸ლ)";
+							}*/
+							var endOfContainer = '';
+							//var today = new Date();
+							//var time = today.getHours() + ":" + today.getMinutes();
+							endOfContainer = timeHtml + timeHtml + timeHtmlEng + containerEnd;
+							$('#conversation').prepend(msgHtml + message.message + msgHtmlEnd + endOfContainer);
+							$('#recent-message').text(message.message);
+						}
+						else if (message.send_type == 'search') {
+							console.log("hi");
+							document.getElementById('searches').textContent = '';
+							const users = JSON.parse(message.users);
+							for(var i = 0; i < users.length; ++i) {
+								console.log(users[i].fields.username)
+								const userHtml = '<div class="chat"> \
+									<img src="';
+								const source = "{% static 'th.jpg' %}";
+								const midHtml = '" alt="Katya Schwendeman" class="profile-pic"> \
+									<div class="chat-name">';
+								const userHtmlEnd	= '</div> \
+									<div class="recent-message">Active Dec 10</div> \
+									</div>';
+								$('#searches').append(userHtml + source + midHtml + users[i].fields.username + userHtmlEnd);
+							}
+						}
+						//console.log(message.length)
+						/**/
 					};
 					chatSocket.onclose = function(e) {
 						console.log('Chat socket closed unexpectedly');
@@ -231,28 +253,27 @@
 								return;
 							}
 							chatSocket.send(JSON.stringify({
-								'search': true,
+								'send_type': 'search',
 								'username_searched': searched
 							}));
+							/*chatSocket.onmessage = function(users){
+								const user_list = JSON.parse(users.data)
+								console.log(user_list.length)
+								document.getElementById('searches').textContent = '';
+								for(var i = 0; i < user_list.length; ++i) {
+									console.log(user_list[i].fields.username)
+									const userHtml = '<div class="chat"> \
+										<img src="';
+									const source = "{% static 'th.jpg' %}";
+									const midHtml = '" alt="Katya Schwendeman" class="profile-pic"> \
+										<div class="chat-name">';
+									const userHtmlEnd	= '</div> \
+										<div class="recent-message">Active Dec 10</div> \
+										</div>';
+									$('#searches').append(userHtml + source + midHtml + user_list[i].fields.username + userHtmlEnd);
+								}
+							};*/
 						}
-						chatSocket.onmessage = function(users){
-							const user_list = JSON.parse(users.data)
-							console.log(user_list);
-							console.log(user_list.length)
-							document.getElementById('searches').textContent = '';
-							for(var i = 0; i < user_list.length; ++i) {
-								console.log(user_list[i].fields.username)
-								const userHtml = '<div class="chat"> \
-									<img src="';
-								const source = "{% static 'th.jpg' %}";
-								const midHtml = '" alt="Katya Schwendeman" class="profile-pic"> \
-									<div class="chat-name">';
-								const userHtmlEnd	= '</div> \
-									<div class="recent-message">Active Dec 10</div> \
-									</div>';
-								$('#searches').append(userHtml + source + midHtml + user_list[i].fields.username + userHtmlEnd);
-							}
-						};
 					</script>
 					<!--<button type="button" id="group-chat">Create a Group Chat</button>-->
 					<div class="modal-body" id="searches">

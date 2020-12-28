@@ -27,9 +27,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # Receive message from WebSocket
     async def receive(self, text_data):
         data_json = json.loads(text_data)
-        #print(json.loads(text_data))
-        if data_json['search'] == False:
-            print("hello")
+        receive_type = data_json['send_type']
+        if receive_type == 'chat_message':
             message = data_json['message']
             await self.channel_layer.group_send(
                 self.room_group_name,
@@ -38,13 +37,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'message': message,
                 }
             )
-        else:
+        elif receive_type == 'search':
             searched = data_json['username_searched']
-            searched_users = await search_userbase(searched)
-            actual = json.loads(searched_users)
-            await self.send(json.dumps(actual))
-        #print(message)
-        # Send message to room group
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'search',
+                    'searched': searched,
+                }
+            )
         
 
     # Receive message from room group
@@ -53,5 +54,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
+            'send_type': 'chat',
             'message': message
+        }))
+
+    async def search(self, event):
+        searched = event['searched']
+        searched_users = await search_userbase(searched)
+        actual = json.loads(searched_users)
+        await self.send(json.dumps({
+            'send_type':'search',
+            'users': json.dumps(actual)
         }))
