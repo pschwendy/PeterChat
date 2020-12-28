@@ -169,6 +169,7 @@
 					});
 					chatSocket.onmessage = function(msg){
 						const message = JSON.parse(msg.data);
+						console.log(message)
 						//const _id = JSON.parse(id.data);
 						//if(message.id == chatSocket.id) {
 						msgHtml = '<div class="message-row sent-message">\
@@ -220,10 +221,27 @@
 								'username_searched': searched
 							}));
 						}
+						chatSocket.onmessage = function(users){
+							const user_list = JSON.parse(users.data)
+							console.log(user_list);
+							console.log(user_list.length)
+							for(var i = 0; i < user_list.length; ++i) {
+								console.log(user_list[i].fields.username)
+								const userHtml = '<div class="chat"> \
+									<img src="';
+								const source = "{% static 'th.jpg' %}";
+								const midHtml = '" alt="Katya Schwendeman" class="profile-pic"> \
+									<div class="chat-name">';
+								const userHtmlEnd	= '</div> \
+									<div class="recent-message">Active Dec 10</div> \
+									</div>';
+								$('#searches').append(userHtml + source + midHtml + user_list[i].fields.username + userHtmlEnd);
+							}
+						};
 					</script>
 					<!--<button type="button" id="group-chat">Create a Group Chat</button>-->
-					<div class="modal-body searches">
-						<div class="chat">
+					<div class="modal-body" id="searches">
+						<!--<div class="chat">
 							<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
 							<div class="chat-name">Katya Schwendeman</div>
 							<div class="recent-message">Active Dec 10</div>
@@ -247,7 +265,7 @@
 							<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
 							<div class="chat-name">Katya Schwendeman</div>
 							<div class="recent-message">Active Dec 10</div>
-						</div>
+						</div>-->
 					</div>
 					<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

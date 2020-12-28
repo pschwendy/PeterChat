@@ -252,7 +252,7 @@ html{
 	text-align: left;
 }
 
-.searches{
+#searches{
 	height: 250px;
 	overflow-y: scroll;
 }

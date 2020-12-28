@@ -29,6 +29,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         data_json = json.loads(text_data)
         #print(json.loads(text_data))
         if data_json['search'] == False:
+            print("hello")
             message = data_json['message']
             await self.channel_layer.group_send(
                 self.room_group_name,
@@ -39,8 +40,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             )
         else:
             searched = data_json['username_searched']
-            await search_userbase(searched)
-            print("done")
+            searched_users = await search_userbase(searched)
+            actual = json.loads(searched_users)
+            await self.send(json.dumps(actual))
         #print(message)
         # Send message to room group
         

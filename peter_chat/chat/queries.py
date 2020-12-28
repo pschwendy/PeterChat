@@ -1,6 +1,7 @@
 from .models import User, Message, Chat, Participant
 from channels.db import database_sync_to_async
 from asgiref.sync import async_to_sync
+from django.core import serializers
 
 def signup(form):
     form.save()
@@ -31,6 +32,8 @@ def send_message(current_chat, user, msg, img, time):
 
 @database_sync_to_async
 def search_userbase(username):
-    print("searching...")
+    searched_users = []
     for user in User.objects.filter(username__contains=username):
-        print(user.username)
+        searched_users.append(user)
+    users_json = serializers.serialize('json', searched_users, fields=('username', 'first_name', 'last_name'))
+    return users_json
