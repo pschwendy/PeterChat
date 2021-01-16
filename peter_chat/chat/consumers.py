@@ -1,7 +1,8 @@
 import json
 #from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .queries import search_userbase
+from channels.auth import login
+from .queries import search_userbase, authenticate
 from channels.db import database_sync_to_async
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -46,6 +47,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'searched': searched,
                 }
             )
+        elif receive_type == 'authenticate':
+            user_login = data_json['username']
+            user = await authenticate(user_login)
+            await login(self.scope, user)
+            await database_sync_to_async(self.scope["session"].save)()
         
 
     # Receive message from room group

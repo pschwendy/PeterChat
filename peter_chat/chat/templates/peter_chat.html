@@ -140,9 +140,11 @@
 					<input type="text" autocomplete="off" id="newmessage" placeholder="Send a message">
 				</form>
 				{{ room_name|json_script:"room-name" }}
+				{{ username|json_script:"username" }}
 				<script>
 					//$(function () {
 					const roomName = JSON.parse(document.getElementById('room-name').textContent);
+					const username = JSON.parse(document.getElementById('username').textContent);
 					const chatSocket = new WebSocket(
 						'ws://'
 						+ window.location.host
@@ -221,6 +223,12 @@
 					};
 					chatSocket.onclose = function(e) {
 						console.log('Chat socket closed unexpectedly');
+					};
+					chatSocket.onopen = function(e) {
+						chatSocket.send(JSON.stringify({
+							'send_type': 'authenticate',
+							'username': username,
+						}));
 					};
 				//});
 				</script>

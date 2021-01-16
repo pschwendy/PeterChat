@@ -35,3 +35,10 @@ def search_userbase(username):
     searched_users = User.objects.filter(username__contains=username)
     users_json = serializers.serialize('json', searched_users, fields=('username', 'first_name', 'last_name'))
     return users_json
+
+@database_sync_to_async
+def authenticate(username_in):
+    account = User.objects.filter(username = username_in)
+    if account.exists():
+        return account[0]
+    return False

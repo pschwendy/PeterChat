@@ -1,4 +1,5 @@
 from django.db import models
+import datetime
 
 # User model
 class User(models.Model):
@@ -18,7 +19,7 @@ class User(models.Model):
     )
     profile_picture = models.ImageField(upload_to='profile_pictures/')
     friends = models.ManyToManyField('self')
-
+    last_login = models.DateField(default=datetime.date(2020, 12, 10))
     def __str__(self):
         return self.username
 

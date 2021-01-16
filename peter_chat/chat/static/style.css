@@ -1,0 +1,258 @@
+* {
+	margin: 0;
+	padding: 0;
+	font-family: serif;
+}
+
+body {
+	height: 100%;
+	place-items: center
+}
+
+html{
+	width: 100%;
+	height: 100%;
+	place-items: center;
+	display: grid;
+	background-color: #D0FFB7;
+}
+
+#chat-box{
+	display: grid;
+	grid:
+		"search-box chat-title" 65px
+		"chat-list conversation" 1fr
+		"profile message" 90px
+		/ 280px 1fr;
+	min-width: 1000px;
+	max-width: 1100px;
+	width: 100%;
+	height: 100vh;
+	background: #B2FFA8
+}
+
+
+#search-box{
+	grid-area: search-box;
+	display: grid;
+	align-items: center;
+	/*border-radius: 10px 0 0 0;*/
+	box-shadow: 0px 1px 1px #3FC55D;
+	z-index: 1;
+	background-color: #3FEE5F;
+}
+
+#search-box input{
+	height: auto;
+	width: 86%;
+	margin-left: 6%;
+}
+
+#chat-list{
+	grid-area: chat-list;
+	border-top: 1px #4DE952;
+	background-color: #5AF65F;
+	overflow-y: scroll;
+	/*max-height: 608px;
+	min-height: 200px;*/
+	height: 100%;
+}
+
+.chat{
+	display: grid;
+
+	font-size: 1.1rem;
+	grid-template-columns: 60px 1fr max-content;
+	grid-row-gap: 5px;
+	border-bottom: 1px solid #3FEE5F;
+	padding: 10px 10px 10px 5px;
+}
+.chat:hover{
+	background-color: #3FEE5F;
+	cursor: pointer;
+}
+.profile-pic{
+	grid-row: span 2;
+	object-fit: cover;
+  height: 50px;
+	width: 50px;
+	border-radius: 50%;
+}
+.test{
+	grid-row: span 2;
+	background-color: red;
+}
+.message-date{
+	font-size: 0.7rem;
+	/*margin-left: -10px;*/
+}
+.recent-message{
+	grid-column: span 1;
+	font-size: 0.9rem;
+	white-space: nowrap;
+	overflow-x: hidden;
+	text-overflow: ellipsis;
+}
+.chat-name{
+	grid-column: span 2;
+	/*margin-left: -10px;*/
+	/*font-size: 1.1rem;*/
+	white-space: nowrap;
+	overflow-x: hidden;
+	text-overflow: ellipsis;
+}
+
+#profile{
+	grid-area: profile;
+	background: #3FEE5F;
+	box-shadow: 0px -1px 3px -3px Green;
+	/*background: #3EE55D;*/
+}
+
+#chat-title{
+	display: grid;
+	/*grid: 33 / 1fr 33px;*/
+	grid-area: chat-title;
+	background: #93FF96;
+	box-shadow: 0px 1px 1px #3EE55D;
+	z-index: 1;
+	padding: 0 20px;
+	align-items: center;
+	align-content: center;
+	color: darkgreen;
+	font-size: 2.0rem;
+}
+
+.center-title{
+	font-weight: bold;
+}
+
+#conversation{
+	grid-area: conversation;
+	background: #B2FFA8;
+	display: flex;
+	flex-direction: column-reverse;
+	padding: 0 20px;
+	overflow-y: scroll;
+}
+
+.message-row{
+	margin-bottom: 20px;
+	display: grid;
+	grid-template-columns: 70%;
+	word-wrap: break-word;
+	word-break: break-all;
+}
+
+.message-text{
+	padding: 9px 14px;
+	font-size: 1.1rem;
+	margin-bottom: 5px;
+	word-wrap: break-word;
+}
+
+.message-time{
+	font-size: 0.9rem;
+}
+
+.sent-message .message-text{
+	background: #3FEE5F;
+	border-radius: 15px 0 15px 15px;
+}
+.sent-message{
+	justify-content: end;
+
+}
+.message-content{
+	display: grid;
+	word-wrap: break-word;
+}
+
+.sent-message .message-content{
+	justify-items: end;
+	word-wrap: break-word;
+}
+
+.received-message{
+	justify-content: start;
+	justify-items: start;
+	text-align: left;
+}
+.received-message .message-text{
+	background-color: #93FF96;
+	border-radius: 0 15px 15px 15px;
+}
+.received-message .message-content{
+	grid-template-columns: 48px 1fr;
+	grid-column-gap: 10px;
+}
+#message{
+	grid-area: message;
+	display: grid;
+	align-items: center;
+	background: #93FF96;
+	box-shadow: 0px -1px 3px -3px Green;
+}
+
+#message input{
+	display: grid;
+	align-items: center;
+	height: 50px;
+	border-radius: 10px 10px 10px 10px;
+	border: none;
+	background-color: #3FEE5F;
+	width: 90%;
+	left: 5%;
+	transform: translate(5%, 0);
+	padding: 0 20px;
+	font-size: 1.2rem;
+}
+
+#message input::placeholder{
+	color: #93FF96;
+	font-size: 1.2rem;
+}
+
+#message input:focus{
+	outline: none;
+}
+
+#search-for{
+	display: grid;
+	align-items: center;
+	border-radius: 10px 10px 10px 10px;
+	border: none;
+	background-color:whitesmoke;
+	width: auto;
+	height: 50px;
+	margin: 10px 10px 0px 10px;
+	padding: 0 20px;
+	font-size: 1.2rem;
+}
+
+#search-for:focus{
+	outline: none;
+}
+
+#group-chat{
+	display: grid;
+	align-items: center;
+	border-radius: 10px 10px 10px 10px;
+	border: none;
+	background-color:whitesmoke;
+	width: auto;
+	height: 30px;
+	margin: 0 10px 0px 10px;
+	padding: 0 20px;
+	font-size: 1.2rem;
+	text-align: left;
+}
+
+#searches{
+	height: 250px;
+	overflow-y: scroll;
+}
+
+.hello{
+	background-color: #3FEE5F;
+}
