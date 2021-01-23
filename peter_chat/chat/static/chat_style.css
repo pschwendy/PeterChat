@@ -24,9 +24,8 @@ html{
 		"chat-list conversation" 1fr
 		"profile message" 90px
 		/ 280px 1fr;
-	min-width: 1000px;
-	max-width: 1100px;
-	width: 100%;
+	max-width: 1000px;
+	width: 100vw;
 	height: 100vh;
 	background: #B2FFA8
 }

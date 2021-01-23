@@ -42,6 +42,7 @@ def home(request):
 	return render(request, 'index.html', {'form': form})
 
 def chat(request, room_name):
+	request.session['username'] = 'kittycat'
 	username = request.session['username']
 	#return render(request, "peter_chat.html", {})
 	return render(request, 'peter_chat.html', {
