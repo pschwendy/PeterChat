@@ -9,6 +9,10 @@ from .forms import UserForm, LoginForm, SignUpForm
 def home(request):
 	'''if request.session.get('username'):
 		return HttpResponseRedirect('/chat/room')'''
+	#if request.COOKIES['username']:
+	#	response = HttpResponseRedirect('/chat/room')
+	#	return response
+
 	if request.method == 'POST':
 		req = request.POST
 		#form = LoginForm(req)
@@ -23,8 +27,9 @@ def home(request):
 				try:
 					signup(form)
 					#signup(username, password, first_name, signup)
-					request.session['username'] = username
-					return HttpResponseRedirect('/chat/room')
+					response = HttpResponseRedirect('/chat/room')
+					response.set_cookie('username', username)
+					return response
 				except:
 					pass
 		elif len(req) == 3:
@@ -35,15 +40,16 @@ def home(request):
 				#
 				#return HttpResponseRedirect('/chat/room')
 				if login(username, password):
-					request.session['username'] = username
-					return HttpResponseRedirect('/chat/room')
+					response = HttpResponseRedirect('/chat/room')
+					response.set_cookie('username', username)
+					return response
 	else:
 		form = UserForm()
 	return render(request, 'index.html', {'form': form})
 
 def chat(request, room_name):
-	request.session['username'] = 'kittycat'
-	username = request.session['username']
+	username = request.COOKIES['username']
+	
 	#return render(request, "peter_chat.html", {})
 	return render(request, 'peter_chat.html', {
         'room_name': room_name,

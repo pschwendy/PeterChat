@@ -31,8 +31,8 @@ def send_message(current_chat, user, msg, img, time):
     current_chat.save()
 
 @database_sync_to_async
-def search_userbase(username):
-    searched_users = User.objects.filter(username__contains=username)
+def search_userbase(username, user):
+    searched_users = User.objects.filter(username__contains=username).exclude(username = user)
     users_json = serializers.serialize('json', searched_users, fields=('username', 'first_name', 'last_name'))
     return users_json
 

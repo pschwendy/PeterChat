@@ -66,7 +66,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def search(self, event):
         searched = event['searched']
-        searched_users = await search_userbase(searched)
+        searched_users = await search_userbase(searched, self.scope["user"])
         actual = json.loads(searched_users)
         await self.send(json.dumps({
             'send_type':'search',
