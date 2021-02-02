@@ -291,3 +291,7 @@ i {
 	padding-left: 10px;
 	display: inline;
 }
+
+i:hover {
+	cursor: pointer;
+}

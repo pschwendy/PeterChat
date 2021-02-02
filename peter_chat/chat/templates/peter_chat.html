@@ -153,6 +153,7 @@
 						+ roomName
 						+ '/'
 					);
+					var newChatMembers = [];
 					var msgHtml = '';
 					var msgHtmlEnd = '</div>'
 					var timeHtml = '<div class="message-time">'
@@ -209,9 +210,12 @@
 							for(var i = 0; i < users.length; ++i) {
 								console.log(users[i].fields.username);
 								const usernameReceived = users[i].fields.username;
+								const idReceived = users[i].fields.pk;
 								var userDiv = document.createElement("div");
 								userDiv.className = "chat inherit";
-
+								if(newChatMembers.indexOf(idReceived) != -1){
+									userDiv.className += " selected";
+								}
 								var userImg = document.createElement("img");
 								userImg.src = "{% static 'th.jpg' %}";
 								userImg.alt = "Katya Schwendeman";
@@ -232,23 +236,36 @@
 								userDiv.onclick = function(){
 									if(userDiv.className.indexOf("selected") != -1) {
 										userDiv.className = "chat inherit";
+										document.getElementById(idReceived + "button").remove();
 										return;
 									}
 									userDiv.className += " selected";
+									$('#searcher').val('');
 									
 									var addedUser = document.createElement("button");
 									addedUser.className = "added-user btn";
+									addedUser.id = idReceived + "button";
 
 									var addedName = document.createElement("span");
 									addedUser.innerHTML = usernameReceived;
 
 									var close = document.createElement("i");
 									close.className = "fa fa-times"
+									close.onclick = function() {
+										for (var i = 0; i < newChatMembers.length; ++i) {
+											if(newChatMembers[i] == idReceived) {
+												newChatMembers.splice(i, i + 1);
+											}
+										};
+										document.getElementById(idReceived + "button").remove();
+										userDiv.className = "chat inherit";
+									};
 
 									addedUser.appendChild(addedName);
 									addedName.appendChild(close);
 
 									$("#search-for").prepend(addedUser);
+									newChatMembers.push(idReceived);
 								};
 
 								const userHtml = '<div class="chat"> \
@@ -292,6 +309,9 @@
 						function readySearch(){
 							$("#search-for").val('');
 							document.getElementById('searches').textContent = '';
+							newChatMembers = [];
+							$('.added-user').remove();
+							
 						}
 						var searchTimeout;
 						document.getElementById('searcher').onkeypress = function () {
