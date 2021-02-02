@@ -81,6 +81,10 @@ html{
 	grid-row: span 2;
 	background-color: red;
 }
+.chat-name,
+.message-date{
+
+}
 .message-date{
 	font-size: 0.7rem;
 	/*margin-left: -10px;*/
@@ -225,11 +229,21 @@ html{
 	width: auto;
 	height: 50px;
 	margin: 10px 10px 0px 10px;
+	font-size: 1.2rem;
 	padding: 0 20px;
+}
+
+#search-for > input{
+	display: grid;
+	align-items: center;
+	border: none;
+	background-color:whitesmoke;
+	width: auto;
+	
 	font-size: 1.2rem;
 }
 
-#search-for:focus{
+#search-for > input:focus{
 	outline: none;
 }
 
@@ -252,6 +266,7 @@ html{
 	overflow-y: scroll;
 }
 
-.hello{
+.selected{
 	background-color: #3FEE5F;
 }
+

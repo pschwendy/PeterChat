@@ -221,19 +221,34 @@ html{
 }
 
 #search-for{
+	display: block;
+	
+}
+
+#search-grid {
 	display: grid;
 	align-items: center;
 	border-radius: 10px 10px 10px 10px;
 	border: none;
 	background-color:whitesmoke;
 	width: auto;
-	height: 50px;
+	min-height: 50px;
 	margin: 10px 10px 0px 10px;
+	font-size: 1.2rem;
 	padding: 0 20px;
+}
+
+#search-for > input{
+	display: inline;
+	align-items: center;
+	border: none;
+	background-color:whitesmoke;
+	width: auto;
+	
 	font-size: 1.2rem;
 }
 
-#search-for:focus{
+#search-for > input:focus{
 	outline: none;
 }
 
@@ -254,4 +269,25 @@ html{
 #searches{
 	height: 250px;
 	overflow-y: scroll;
+}
+
+.selected{
+	background-color: #3FEE5F;
+}
+
+.added-user{
+	display: inline;
+	background-color: white !important;;
+	border-radius: 0.6em;
+	height: auto;
+	padding: 0px;
+	width: auto;
+	padding-top: 5px !important;
+	padding-top: 5px !important;
+	margin: 4px 4px 4px 0px!important;
+}
+
+i {
+	padding-left: 10px;
+	display: inline;
 }

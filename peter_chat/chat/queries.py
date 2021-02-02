@@ -18,7 +18,7 @@ def add_chat(participants_in):
         chat_create.object.update(private=False)
     chat_create.object.participants.add(user_in for user_in in participants_in)
     chat_create.save()
-    participant = Participant.objects.create(user = (user_in for user_in in participants_in), chat = chat_create)
+    Participant.objects.create(user = (user_in for user_in in participants_in), chat = chat_create)
 
 def send_message(current_chat, user, msg, img, time):
     message = Message.objects.create(
@@ -32,7 +32,7 @@ def send_message(current_chat, user, msg, img, time):
 
 @database_sync_to_async
 def search_userbase(username, user):
-    searched_users = User.objects.filter(username__contains=username).exclude(username = user)
+    searched_users = User.objects.filter(username__startswith=username).exclude(username = user)
     users_json = serializers.serialize('json', searched_users, fields=('username', 'first_name', 'last_name'))
     return users_json
 
