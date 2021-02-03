@@ -19,6 +19,18 @@ def add_chat(participants_in):
     chat_create.object.participants.add(user_in for user_in in participants_in)
     chat_create.save()
     Participant.objects.create(user = (user_in for user_in in participants_in), chat = chat_create)
+    return chat_create
+
+@database_sync_to_async
+def search_chatbase(participants_in, user):
+    print(participants_in[0]['pk'])
+    try:
+        account = Chat.objects.filter(private=True).filter(participant__pk=participants_in[0]['pk']).filter(participant__pk=user.pk)
+    except:
+        print("Query not allowed")
+    if account.exists():
+        return account[0]
+    return False
 
 def send_message(current_chat, user, msg, img, time):
     message = Message.objects.create(

@@ -175,7 +175,7 @@
 					chatSocket.onmessage = function(msg){
 						const message = JSON.parse(msg.data);
 						console.log(message.send_type)
-						if(message.send_type == 'chat') {
+						if (message.send_type == 'chat') {
 							//const _id = JSON.parse(id.data);
 							//if(message.id == chatSocket.id) {
 							msgHtml = '<div class="message-row sent-message">\
@@ -211,6 +211,7 @@
 								console.log(users[i].fields.username);
 								const usernameReceived = users[i].fields.username;
 								const idReceived = users[i].fields.pk;
+								const user = users[i];
 								var userDiv = document.createElement("div");
 								userDiv.className = "chat inherit";
 								if(newChatMembers.indexOf(idReceived) != -1){
@@ -253,7 +254,7 @@
 									close.className = "fa fa-times"
 									close.onclick = function() {
 										for (var i = 0; i < newChatMembers.length; ++i) {
-											if(newChatMembers[i] == idReceived) {
+											if(newChatMembers[i].fields.pk == idReceived) {
 												newChatMembers.splice(i, i + 1);
 											}
 										};
@@ -265,7 +266,7 @@
 									addedName.appendChild(close);
 
 									$("#search-for").prepend(addedUser);
-									newChatMembers.push(idReceived);
+									newChatMembers.push(user);
 								};
 
 								const userHtml = '<div class="chat"> \
@@ -281,6 +282,9 @@
 								$('#searches').append(userDiv);
 							}
 						}
+						else if (message.send_type == 'switch') {
+							// switch url to chat
+						} 
 						//console.log(message.length)
 						/**/
 					};
@@ -352,6 +356,13 @@
 								}
 							};*/
 						}
+						function findChat() {
+							chatSocket.send(JSON.stringify({
+								'send_type': 'find_create',
+								'participants': newChatMembers
+							}));
+							newChatMembers.length = 0;
+						}
 					</script>
 					<!--<button type="button" id="group-chat">Create a Group Chat</button>-->
 					<div class="modal-body" id="searches">
@@ -383,7 +394,7 @@
 					</div>
 					<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-					<button type="button" class="btn btn-primary">Save changes</button>
+					<button type="button" class="btn btn-primary" onclick="findChat()" data-dismiss="modal">Save changes</button>
 					</div>
 				</div>
 			</div>

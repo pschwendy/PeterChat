@@ -2,7 +2,7 @@ import json
 #from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.auth import login
-from .queries import search_userbase, authenticate
+from .queries import search_userbase, authenticate, search_chatbase, add_chat
 from channels.db import database_sync_to_async
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -47,6 +47,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'searched': searched,
                 }
             )
+        elif receive_type == 'find_create':
+            participants = data_json['participants']
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'find_chat',
+                    'participants': participants,
+                }
+            )
         elif receive_type == 'authenticate':
             user_login = data_json['username']
             user = await authenticate(user_login)
@@ -71,4 +80,43 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(json.dumps({
             'send_type':'search',
             'users': json.dumps(actual)
+        }))
+
+    async def find_chat(self, event):
+        participants = event['participants']
+        print(participants)
+        if len(participants) > 1:
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'create_chat',
+                    'participants': participants,
+                }
+            )
+            return
+
+        found_chat = await search_chatbase(participants, self.scope["user"])
+        print(found_chat)
+        return
+        if found_chat == False:
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'create_chat',
+                    'participants': participants,
+                }
+            )
+        else:
+            await self.send(json.dumps({
+                'send_type':'switch',
+                'chat':json.dumps(found_chat)
+            }))
+
+    async def create_chat(self, event):
+        participants = event['participants']
+        participants.append(self.scope["user"])
+        created_chat = add_chat(participants)
+        await self.send(json.dumps({
+            'send_type':'switch',
+            'chat':json.dumps(created_chat)
         }))
