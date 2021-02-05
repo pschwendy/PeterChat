@@ -1,7 +1,7 @@
 * {
 	margin: 0;
 	padding: 0;
-	font-family: serif;
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif; 
 }
 
 body {
@@ -208,12 +208,12 @@ html{
 	left: 5%;
 	transform: translate(5%, 0);
 	padding: 0 20px;
-	font-size: 1.2rem;
+	font-size: 1.1rem;
 }
 
 #message input::placeholder{
 	color: #93FF96;
-	font-size: 1.2rem;
+	font-size: 1.1rem;
 }
 
 #message input:focus{
@@ -234,7 +234,7 @@ html{
 	width: auto;
 	min-height: 50px;
 	margin: 10px 10px 0px 10px;
-	font-size: 1.2rem;
+	font-size: 1.1rem;
 	padding: 0 20px;
 }
 
@@ -245,7 +245,7 @@ html{
 	background-color:whitesmoke;
 	width: auto;
 	
-	font-size: 1.2rem;
+	font-size: 1.1rem;
 }
 
 #search-for > input:focus{
@@ -262,7 +262,7 @@ html{
 	height: 30px;
 	margin: 0 10px 0px 10px;
 	padding: 0 20px;
-	font-size: 1.2rem;
+	font-size: 1.1rem;
 	text-align: left;
 }
 

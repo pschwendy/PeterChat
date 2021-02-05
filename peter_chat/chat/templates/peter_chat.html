@@ -144,9 +144,9 @@
 				{{ username|json_script:"username" }}
 				<script>
 					//$(function () {
-					const roomName = JSON.parse(document.getElementById('room-name').textContent);
+					var roomName = JSON.parse(document.getElementById('room-name').textContent);
 					const username = JSON.parse(document.getElementById('username').textContent);
-					const chatSocket = new WebSocket(
+					var chatSocket = new WebSocket(
 						'ws://'
 						+ window.location.host
 						+ '/ws/chat/'
@@ -160,6 +160,7 @@
 					var timeHtmlEng = '</div>'
 					var containerEnd = '</div>\
 						</div>'
+					let load = true;
 					//const chatSocket = new WebSocket('ws://' + window.localation.host '/chat/');
 
 					$('#send').submit(function(){
@@ -169,6 +170,13 @@
 							'send_type': 'chat_message',
 							'message': msg,
 						}));
+						msgHtml = '<div class="message-row sent-message">\
+									<div class="message-content">\
+									<div class="message-text">'
+						var endOfContainer = '';
+						endOfContainer = timeHtml + timeHtml + timeHtmlEng + containerEnd;
+						$('#conversation').prepend(msgHtml + msg + msgHtmlEnd + endOfContainer);
+						
 						$('#newmessage').val('');
 						return false;
 					});
@@ -177,17 +185,22 @@
 						console.log(message.send_type)
 						if (message.send_type == 'chat') {
 							//const _id = JSON.parse(id.data);
-							//if(message.id == chatSocket.id) {
-							msgHtml = '<div class="message-row sent-message">\
+							/*if(message.sender == username) {
+								msgHtml = '<div class="message-row sent-message">\
 									<div class="message-content">\
 									<div class="message-text">'
-							//}
-							//else{
-								/*msgHtml = '<div class="message-row received-message">\
+							}*/
+							if (message.sender != username) {
+								msgHtml = '<div class="message-row received-message">\
 									<div class="message-content">\
 										<img src="th.jpg" alt="Katya Schwendeman" class="profile-pic">\
-										<div class="message-text">'*/
-							//}
+										<div class="message-text">'
+								var endOfContainer = '';
+								//var today = new Date();
+								//var time = today.getHours() + ":" + today.getMinutes();
+								endOfContainer = timeHtml + timeHtml + timeHtmlEng + containerEnd;
+								$('#conversation').prepend(msgHtml + message.message + msgHtmlEnd + endOfContainer);
+							}
 							/*msgHtml = '<div class="message-row sent-message">\
 								<div class="message-content">\
 								<div class="message-text">'*/
@@ -196,11 +209,6 @@
 							} else if (message.indexOf("/facepalm") != -1){
 								message = "(—‸ლ)";
 							}*/
-							var endOfContainer = '';
-							//var today = new Date();
-							//var time = today.getHours() + ":" + today.getMinutes();
-							endOfContainer = timeHtml + timeHtml + timeHtmlEng + containerEnd;
-							$('#conversation').prepend(msgHtml + message.message + msgHtmlEnd + endOfContainer);
 							$('#recent-message').text(message.message);
 						}
 						else if (message.send_type == 'search') {
@@ -283,8 +291,87 @@
 							}
 						}
 						else if (message.send_type == 'switch') {
-							// switch url to chat
-						} 
+							switchChat(JSON.parse(message.chat))
+						}
+						else if (message.send_type == 'load' && load) {
+							load = false;
+							console.log("HIIIII!!!!");
+							const chats = message.chats;
+							console.log(chats.length);
+							for(var i = 0; i < chats.length; ++i) {
+								console.log("HELLO");
+								chat = chats[i];
+								/*<div class="chat">
+									<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
+									<div class="chat-name">Katya Schwendeman</div>
+									<div class="recent-message">MESSAGEMESSAGEMESSAGEMESSAGE</div>
+									<div class="message-date">Dec 10</div>
+								</div>*/
+
+								var userImg = document.createElement("img");
+								userImg.src = "{% static 'th.jpg' %}";
+								userImg.alt = "Katya Schwendeman";
+								userImg.className = "profile-pic";
+
+								var usernameDiv = document.createElement("div");
+								usernameDiv.className = "chat-name";
+								var chatName = '';
+								const private = chat.fields.private == true;
+								if (!private == false && chat.fields.chat_name != '') {
+									chatName = chat.fields.chat_name;
+								} else {
+									for (var j = 0; j < chat.fields.participants.length; ++j) {
+										if (chat.fields.participants[j].fields.username == username) {
+											continue;
+										}
+										chatName += participant.fields.username;
+										if(j != chat.fields.participants.length - 1) {
+											chatName += + ", ";
+										}
+									}
+								}
+								usernameDiv.innerHTML = chatName;
+
+								var lastMessage = document.createElement("div");
+								lastMessage.className = "recent-message";
+								lastMessage.innerHTML = "hi";
+
+								var lastMessageDate = document.createElement("div");
+								lastMessageDate.className = "message-date";
+								lastMessageDate.innerHTML = "Active Dec 10";
+
+								var chatDiv = document.createElement("div");
+								chatDiv.className = "chat";
+								chatDiv.appendChild(userImg);
+								chatDiv.appendChild(usernameDiv);
+								chatDiv.appendChild(lastMessage);
+								chatDiv.appendChild(lastMessageDate);
+
+								chatDiv.onclick = function() {
+									switchChat(chat.pk);
+								};
+								$("#chat-list").append(chatDiv);
+								console.log("PEW");
+							}
+							for(msg of message.messages) {
+								if(msg.fields.sender == username) {
+									msgHtml = '<div class="message-row sent-message">\
+										<div class="message-content">\
+										<div class="message-text">'
+								}
+								else {
+									msgHtml = '<div class="message-row received-message">\
+										<div class="message-content">\
+											<img src="{% static "th.jpg" %}" alt="Katya Schwendeman" class="profile-pic">\
+											<div class="message-text">'
+									var endOfContainer = '';
+									//var today = new Date();
+									//var time = today.getHours() + ":" + today.getMinutes();
+								}
+								endOfContainer = timeHtml + timeHtml + timeHtmlEng + containerEnd;
+								$('#conversation').prepend(msgHtml + msg.fields.content + msgHtmlEnd + endOfContainer);
+							}
+						}
 						//console.log(message.length)
 						/**/
 					};
@@ -297,6 +384,21 @@
 							'username': username,
 						}));
 					};
+
+					function switchChat(id) {
+						const newUrl = '/chat/'
+						+ id
+						+ '/';
+						window.history.pushState("","", newUrl);
+						//chatSocket.close()
+						chatSocket = new WebSocket(
+							'ws://'
+							+ window.location.host
+							+ '/ws/chat/'
+							+ id
+							+ '/'
+						);
+					}
 				//});
 				</script>
 			</div>

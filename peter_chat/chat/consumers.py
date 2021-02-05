@@ -1,8 +1,9 @@
 import json
+from datetime import datetime
 #from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.auth import login
-from .queries import search_userbase, authenticate, search_chatbase, add_chat
+from .queries import search_userbase, authenticate, search_chatbase, add_chat, get_chats, send_message, get_current_messages
 from channels.db import database_sync_to_async
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -31,6 +32,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         receive_type = data_json['send_type']
         if receive_type == 'chat_message':
             message = data_json['message']
+            await send_message(self.room_name, self.scope['user'], message, None, datetime.now())
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -61,16 +63,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
             user = await authenticate(user_login)
             await login(self.scope, user)
             await database_sync_to_async(self.scope["session"].save)()
+            print("HI!")
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'get_user_chats'
+                }
+            )
+            
         
 
     # Receive message from room group
     async def chat_message(self, event):
         message = event['message']
-
+        await send_message(self.room_name, self.scope['user'], message, None, datetime.now())
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'send_type': 'chat',
-            'message': message
+            'message': message,
+            'sender': self.scope['user'].username
         }))
 
     async def search(self, event):
@@ -84,7 +95,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def find_chat(self, event):
         participants = event['participants']
-        print(participants)
+        print()
+        print(f"participants: {participants}")
         if len(participants) > 1:
             await self.channel_layer.group_send(
                 self.room_group_name,
@@ -96,8 +108,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return
 
         found_chat = await search_chatbase(participants, self.scope["user"])
-        print(found_chat)
-        return
         if found_chat == False:
             await self.channel_layer.group_send(
                 self.room_group_name,
@@ -109,14 +119,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
         else:
             await self.send(json.dumps({
                 'send_type':'switch',
-                'chat':json.dumps(found_chat)
+                'chat':json.dumps(found_chat.pk)
             }))
 
     async def create_chat(self, event):
         participants = event['participants']
-        participants.append(self.scope["user"])
-        created_chat = add_chat(participants)
+
+        # participants.append(self.scope["user"])
+        created_chat = await add_chat(participants, self.scope["user"])
         await self.send(json.dumps({
             'send_type':'switch',
-            'chat':json.dumps(created_chat)
+            'chat':json.dumps(created_chat.pk)
+        }))
+
+    async def get_user_chats(self, event):
+        chats = await get_chats(self.scope["user"])
+        messages = await get_current_messages(self.room_name)
+        print("HI!")
+        await self.send(text_data=json.dumps({
+            'send_type': 'load',
+            'chats': chats,
+            'messages': messages
         }))

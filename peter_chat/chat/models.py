@@ -20,8 +20,8 @@ class User(models.Model):
     profile_picture = models.ImageField(upload_to='profile_pictures/')
     friends = models.ManyToManyField('self')
     last_login = models.DateField(default=datetime.date(2020, 12, 10))
-    def __str__(self):
-        return self.username
+   # def __str__(self):
+    #    return self.username
 
     def get_status(self):
         return self.Status.label
@@ -39,6 +39,7 @@ class Message(models.Model):
 
 # Chat model
 class Chat(models.Model):
+    chat_name = models.CharField(max_length=50, null=True)
     participants = models.ManyToManyField(User, related_name='chats', through='Participant')
     messages = models.ManyToManyField(Message, blank=True)
     private = models.BooleanField(default=True)
