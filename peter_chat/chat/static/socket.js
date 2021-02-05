@@ -66,4 +66,14 @@ class ChatSocket {
             'participants': newChatMembers
         }));
     }
+
+    updateSocket(roomName) {
+        this.socket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/chat/'
+            + roomName
+            + '/'
+        );
+    }
 };

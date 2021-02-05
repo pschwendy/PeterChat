@@ -73,12 +73,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'type': 'get_user_chats'
                 }
             )
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                {
-                    'type': 'get_chat_messages'
-                }
-            )
+            
             
             
         
@@ -144,12 +139,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def get_user_chats(self, event):
         chats = await get_chats(self.scope["user"])
-        #messages = await get_current_messages(self.room_name)
+        messages = await get_current_messages(self.room_name)
         #print("HI!")
-        #pk = self.scope["user"].pk
+        pk = self.scope["user"].pk
         await self.send(text_data=json.dumps({
             'send_type': 'load',
             'chats': chats,
+            'messages': messages,
+            'pk': pk
         }))
 
     async def get_chat_messages(self, event):
