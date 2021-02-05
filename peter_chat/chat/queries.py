@@ -38,11 +38,8 @@ def add_chat(participants_in, user):
 @database_sync_to_async
 def search_chatbase(participants_in, user):
     print(participants_in[0]['pk'])
-    try:
-        account = Chat.objects.filter(private=True).filter(participants__pk=participants_in[0]['pk'])
-        print(account[0])
-    except:
-        print("Query not allowed")
+    account = Chat.objects.filter(private=True).filter(participants__pk=participants_in[0]['pk']).filter(participants__pk=user.pk)
+    #print(account[0])
     if account.exists():
         print("returning account")
         return account[0]
@@ -51,15 +48,18 @@ def search_chatbase(participants_in, user):
 
 @database_sync_to_async
 def send_message(chat_pk, user, msg, img, time):
+    current_chat = Chat.objects.get(pk=chat_pk)
     message = Message.objects.create(
         sender = user,
+        chat = current_chat,
         content = msg,
         image = img,
         timestamp = time
     )
-    current_chat = Chat.objects.get(pk=chat_pk)
-    current_chat.messages.add(message)
-    current_chat.save()
+    return
+    ##current_chat = Chat.objects.get(pk=chat_pk)
+    #current_chat.messages.add(message)
+    #current_chat.save()
 
 @database_sync_to_async
 def search_userbase(username, user):
@@ -79,34 +79,41 @@ def authenticate(username_in):
 def get_chats(user):
     #Participant.objects.all().delete()
     ##Chat.objects.all().delete()
-    chats = Chat.objects.filter(participants__pk=user.pk).order_by("-messages__timestamp")
+    chats = Chat.objects.filter(participants__pk=user.pk)#.order_by("-message__timestamp")
+    print(len(chats))
     chats_json = serializers.serialize('json', chats)
     loaded_chats = json.loads(chats_json)
+    sliced = user.username
     for chat in loaded_chats:
-        sliced = user.username
+        print(chat['fields']['chat_name'].index(sliced))
         try:
-            if chat['fields']['chat_name'].index(sliced + ", "):
-                chat['fields']['chat_name'] = chat['fields']['chat_name'].replace(sliced + ", ", "")
+            if chat['fields']['chat_name'].index(sliced + ", ") != -1:
+                chat['fields']['chat_name'] = chat['fields']['chat_name'].replace(sliced + ",", "")
         except:
+            print(chat['fields']['chat_name'].index(sliced))
             chat['fields']['chat_name'] = chat['fields']['chat_name'].replace(", " + sliced, "")
              
     #participants = Chat.participants.all()
     #print("NAME")
     #print(chats_json)
+    
     print(len(loaded_chats))
+    print(f'loaded chats: {loaded_chats}')
     return loaded_chats
 
 @database_sync_to_async
 def get_current_messages(room):
     #Participant.objects.all().delete()
     #Chat.objects.all().delete()
+    print(f'room: {room}')
     try:
         current_chat = Chat.objects.get(pk=room)
-        current_messages = current_chat.messages.all().order_by("-timestamp")
+        ##current_messages = current_chat.messages.all().order_by("-timestamp")
+        current_messages = current_chat.message_set.all().order_by("timestamp")
         messages_json = serializers.serialize('json', current_messages[:200])
         loaded_messages = json.loads(messages_json)  
-        print(f'room: {room}')
-        print(loaded_messages)
+        
+        ##print(loaded_messages)
         return loaded_messages
     except:
         return False    

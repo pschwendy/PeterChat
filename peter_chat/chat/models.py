@@ -29,23 +29,23 @@ class User(models.Model):
     def get_name(self):
         return self.first_name + " " + self.last_name
 
-
-# Message model
-class Message(models.Model):
-    sender = models.ForeignKey(User, on_delete = models.CASCADE)
-    content = models.TextField()
-    image = models.ImageField(upload_to='message_images/', blank=True)
-    timestamp = models.DateTimeField(auto_now_add=True)
-
 # Chat model
 class Chat(models.Model):
     chat_name = models.CharField(max_length=50, null=True)
     participants = models.ManyToManyField(User, related_name='chats', through='Participant')
-    messages = models.ManyToManyField(Message, blank=True)
+    #messages = models.ManyToManyField(Message, blank=True)
     private = models.BooleanField(default=True)
 
     def __str__(self):
         return "{}".format(self.pk)
+
+# Message model
+class Message(models.Model):
+    sender = models.ForeignKey(User, on_delete = models.CASCADE)
+    chat = models.ForeignKey(Chat, on_delete = models.CASCADE, default=1)
+    content = models.TextField()
+    image = models.ImageField(upload_to='message_images/', blank=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
 # Model governing user relationship to a chat
 class Participant(models.Model):

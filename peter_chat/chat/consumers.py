@@ -10,7 +10,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'chat_%s' % self.room_name
-
+        #self.messages = await get_current_messages(self.room_name)
         # Join room group
         await self.channel_layer.group_add(
             self.room_group_name,
@@ -18,6 +18,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
         await self.accept()
+        
 
     async def disconnect(self, close_code):
         # Leave room group
@@ -59,6 +60,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 }
             )
         elif receive_type == 'authenticate':
+            print("authenticating...")
             user_login = data_json['username']
             user = await authenticate(user_login)
             await login(self.scope, user)
@@ -70,13 +72,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'type': 'get_user_chats'
                 }
             )
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'get_chat_messages'
+                }
+            )
+            
             
         
 
     # Receive message from room group
     async def chat_message(self, event):
         message = event['message']
-        await send_message(self.room_name, self.scope['user'], message, None, datetime.now())
+        #await send_message(self.room_name, self.scope['user'], message, None, datetime.now())
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'send_type': 'chat',
@@ -134,10 +143,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def get_user_chats(self, event):
         chats = await get_chats(self.scope["user"])
-        messages = await get_current_messages(self.room_name)
-        print("HI!")
+        #messages = await get_current_messages(self.room_name)
+        #print("HI!")
+        #pk = self.scope["user"].pk
         await self.send(text_data=json.dumps({
             'send_type': 'load',
             'chats': chats,
-            'messages': messages
+        }))
+
+    async def get_chat_messages(self, event):
+        messages = await get_current_messages(self.room_name)
+        pk = self.scope["user"].pk
+        print("...sending messages")
+        await self.send(text_data=json.dumps({
+            'send_type': 'load_messages',
+            'messages': messages,
+            'pk': pk
         }))
