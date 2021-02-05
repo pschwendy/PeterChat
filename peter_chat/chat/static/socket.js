@@ -16,7 +16,7 @@ var timeHtmlEng = '</div>'
 var containerEnd = '</div>\
     </div>';*/
 
-class ChatSocket{
+class ChatSocket {
     constructor(roomName, username) {
         this.socket = new WebSocket(
             'ws://'
