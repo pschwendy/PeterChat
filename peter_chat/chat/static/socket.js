@@ -41,7 +41,7 @@ class ChatSocket {
             } else if (message.send_type == 'load') {
                 // load chats
                 console.log("...loading chats...");
-                loadChats(message, username);
+                loadChats(message, username, roomName);
             } else if(message.send_type == 'load_messages') {
                 // load messages
                 console.log("pk: " + message.pk);

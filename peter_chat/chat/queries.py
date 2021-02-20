@@ -15,7 +15,6 @@ def login(username_in, password_in):
 
 @database_sync_to_async
 def add_chat(participants_in, user):
-    # plz work
     name = ""
     chat_create = Chat()
     if len(participants_in) > 2:
@@ -39,7 +38,6 @@ def add_chat(participants_in, user):
 def search_chatbase(participants_in, user):
     print(participants_in[0]['pk'])
     account = Chat.objects.filter(private=True).filter(participants__pk=participants_in[0]['pk']).filter(participants__pk=user.pk)
-    #print(account[0])
     if account.exists():
         print("returning account")
         return account[0]
@@ -57,9 +55,9 @@ def send_message(chat_pk, user, msg, img, time):
         timestamp = time
     )
     return
-    ##current_chat = Chat.objects.get(pk=chat_pk)
-    #current_chat.messages.add(message)
-    #current_chat.save()
+    # current_chat = Chat.objects.get(pk=chat_pk)
+    # current_chat.messages.add(message)
+    # current_chat.save()
 
 @database_sync_to_async
 def search_userbase(username, user):
@@ -68,9 +66,13 @@ def search_userbase(username, user):
     return users_json
 
 @database_sync_to_async
-def authenticate(username_in):
+def authenticate(username_in, room):
     account = User.objects.filter(username = username_in)
+    # in_chat = current_chat.check()
     if account.exists():
+        current_chat = Chat.objects.filter(participants__pk=account[0].pk).filter(pk=room)
+        if not current_chat.exists():
+            return False
         print(account[0])
         return account[0]
     return False
@@ -92,32 +94,24 @@ def get_chats(user):
         except:
             print(chat['fields']['chat_name'].index(sliced))
             chat['fields']['chat_name'] = chat['fields']['chat_name'].replace(", " + sliced, "")
-             
-    #participants = Chat.participants.all()
-    #print("NAME")
-    #print(chats_json)
     
-    print(len(loaded_chats))
-    print(f'loaded chats: {loaded_chats}')
+    # print(len(loaded_chats))
+    # print(f'loaded chats: {loaded_chats}')
     return loaded_chats
 
 @database_sync_to_async
 def get_current_messages(room):
-    #Participant.objects.all().delete()
-    #Chat.objects.all().delete()
+    # Participant.objects.all().delete()
+    # Chat.objects.all().delete()
     print(f'room: {room}')
     try:
         current_chat = Chat.objects.get(pk=room)
-        ##current_messages = current_chat.messages.all().order_by("-timestamp")
-        current_messages = current_chat.message_set.all().order_by("timestamp")
-        messages_json = serializers.serialize('json', current_messages[:200])
+        #current_messages = current_chat.messages.all().order_by("-timestamp")
+        current_messages = current_chat.message_set.all().order_by("-timestamp")
+        messages_json = serializers.serialize('json', current_messages[:20])
         loaded_messages = json.loads(messages_json)  
         
-        ##print(loaded_messages)
         return loaded_messages
     except:
-        return False    
-    #participants = Chat.participants.all()
-    #print("NAME")
-    #print(chats_json)
+        return False
     

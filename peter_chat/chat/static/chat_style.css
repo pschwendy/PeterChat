@@ -73,17 +73,13 @@ html{
 .profile-pic{
 	grid-row: span 2;
 	object-fit: cover;
-  height: 50px;
+  	height: 50px;
 	width: 50px;
 	border-radius: 50%;
 }
 .test{
 	grid-row: span 2;
 	background-color: red;
-}
-.chat-name,
-.message-date{
-
 }
 .message-date{
 	font-size: 0.7rem;
@@ -158,7 +154,7 @@ html{
 	font-size: 0.9rem;
 }
 
-.sent-message .message-text{
+.sent-message .message-list > .message-text{
 	background: #3FEE5F;
 	border-radius: 15px 0 15px 15px;
 }
@@ -181,9 +177,18 @@ html{
 	justify-items: start;
 	text-align: left;
 }
+.message-list{
+	/*flex-direction: column;*/
+	display: grid;
+	justify-content: start;
+    justify-items: start;
+    text-align: left;
+	/*justify-items: start;*/
+}
 .received-message .message-text{
 	background-color: #93FF96;
 	border-radius: 0 15px 15px 15px;
+	
 }
 .received-message .message-content{
 	grid-template-columns: 48px 1fr;

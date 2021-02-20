@@ -85,15 +85,18 @@
 						<div id="message-text" class="message-text">LOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONG</div>
 						<div class="message-time">Dec 10</div>
 					</div>
-				</div>
-				<div class="message-row received-message">
+				</div>-->
+				<!--<div class="message-row received-message">
 					<div class="message-content">
 						<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
-						<div class="message-text">LOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONG</div>
-						<div class="message-time">Dec 10</div>
+						<div class="message-list">
+							<div class="message-text">boo</div>
+							<div class="message-text">boooooo</div>
+							<div class="message-text">boo</div>
+						</div>
 					</div>
-				</div>
-				<div class="message-row sent-message">
+				</div>-->
+				<!--<div class="message-row sent-message">
 					<div class="message-content">
 						<div class="message-text">LOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONGLOOOOOOOOONG</div>
 						<div class="message-time">Dec 10</div>
@@ -232,12 +235,57 @@
 							$('#searches').append(userDiv);
 						}
 					}
-					function loadChats(message, username){	
+					function loadChats(message, username, roomName){	
 						$('#conversation').html('');
 						pk = message.pk;
 						console.log("...receiving messages")
-						for(msg of message.messages) {
+						for(var i = 0; i < message.messages.length; i++) {
+							var msg = message.messages[i];
+							var messageRow = document.createElement("div");
+
+							var messageContent = document.createElement("div");
+							messageContent.className = "message-content";
+
+							var messageSender = document.createElement("img");
+							messageSender.className = "profile-pic";
+							messageSender.src = "{% static 'th.jpg' %}";
+							
+							var messageList = document.createElement("div");
+							messageList.className = "message-list";
+							
+							var leadingMessage = document.createElement("div");
+							leadingMessage.className = "message-text";
+							leadingMessage.innerText = msg.fields.content;
+
 							if(msg.fields.sender == pk) {
+								messageRow.className = "message-row sent-message";
+							} else {
+								messageRow.className = "message-row received-message";
+								messageContent.appendChild(messageSender);
+							}
+							try {
+								messageList.appendChild(leadingMessage);
+								var nextMsg = message.messages[i+1];
+								console.log(nextMsg.fields);
+								while(msg.fields.sender == nextMsg.fields.sender) {
+									msg = message.messages[i+1];
+									var nextMessage = document.createElement("div");
+									nextMessage.className = "message-text";
+									nextMessage.innerText = msg.fields.content;
+									
+									messageList.prepend(nextMessage);
+									++i;
+									nextMsg = message.messages[i+1];
+								}
+							}
+							catch {
+								console.log("No more messages!");
+							}
+							messageContent.appendChild(messageList);
+							messageRow.appendChild(messageContent);
+							document.getElementById('conversation').appendChild(messageRow);
+							//!--------------------------
+							/*if(msg.fields.sender == pk) {
 								msgHtml = '<div class="message-row sent-message">\
 									<div class="message-content">\
 									<div class="message-text">'
@@ -250,19 +298,13 @@
 								var endOfContainer = '';
 							}
 							endOfContainer = timeHtml + timeHtml + timeHtmlEng + containerEnd;
-							$('#conversation').prepend(msgHtml + msg.fields.content + msgHtmlEnd + endOfContainer);
+							$('#conversation').append(msgHtml + msg.fields.content + msgHtmlEnd + endOfContainer);*/
 						}
 						$('#chat-list').html('');
 						const chats = message.chats;
 						for(var i = 0; i < chats.length; ++i) {
 							console.log("HELLO");
 							chat = chats[i];
-							/*<div class="chat">
-								<img src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="profile-pic">
-								<div class="chat-name">Katya Schwendeman</div>
-								<div class="recent-message">MESSAGEMESSAGEMESSAGEMESSAGE</div>
-								<div class="message-date">Dec 10</div>
-							</div>*/
 
 							var userImg = document.createElement("img");
 							userImg.src = "{% static 'th.jpg' %}";
@@ -287,6 +329,9 @@
 								}
 							}
 							usernameDiv.innerHTML = chatName;
+							if(chat.pk == roomName) {
+								$('#chat-title').text(chatName);
+							}
 
 							var lastMessage = document.createElement("div");
 							lastMessage.className = "recent-message";
@@ -344,9 +389,21 @@
 								'username': chatSocket.username,
 							}));
 						}
+						$('#conversation').html('');
 						console.log('switching...');
 					}
-					
+					$("#conversation").scroll(function(){
+						
+						var position = $("#conversation").scrollTop();
+						//console.log("position" + position);
+						var middle = $("#conversation").height()/2;
+						//console.log("middle" + middle);
+						//console.log("position: " + pos);
+						if( position <= -middle){
+							console.log("fetch more messages");
+						}
+
+					});
 					/*chatSocket.socket.onopen = function(e){
 						chatSocket.socket.send(JSON.stringify({
 							'send_type': 'authenticate',

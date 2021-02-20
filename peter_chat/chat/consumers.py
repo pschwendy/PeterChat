@@ -63,7 +63,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         elif receive_type == 'authenticate':
             print("authenticating...")
             user_login = data_json['username']
-            user = await authenticate(user_login)
+            user = await authenticate(user_login, self.room_name)
             await login(self.scope, user)
             await database_sync_to_async(self.scope["session"].save)()
             print("HI!")
@@ -73,10 +73,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'type': 'get_user_chats'
                 }
             )
-            
-            
-            
-        
 
     # Receive message from room group
     async def chat_message(self, event):
