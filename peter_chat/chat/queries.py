@@ -79,12 +79,12 @@ def authenticate(username_in, room):
 
 @database_sync_to_async
 def get_chats(user):
-    #Participant.objects.all().delete()
-    ##Chat.objects.all().delete()
-    chats = Chat.objects.filter(participants__pk=user.pk)#.order_by("-message__timestamp")
-    print(len(chats))
+    # Participant.objects.all().delete()
+    # Chat.objects.all().delete()
+    chats = Chat.objects.filter(participants__pk=user.pk)##.order_by("messages__timestamp")#.order_by("-message__timestamp")
     chats_json = serializers.serialize('json', chats)
     loaded_chats = json.loads(chats_json)
+    print(f'chat: {loaded_chats[0]}')
     sliced = user.username
     for chat in loaded_chats:
         print(chat['fields']['chat_name'].index(sliced))

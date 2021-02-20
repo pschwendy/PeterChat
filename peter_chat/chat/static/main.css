@@ -1,6 +1,8 @@
 #hero{
     position: relative;
     filter: brightness(50%);
+    height: 100vh;
+    object-fit: cover;
 }
 
 .hero-nav{
