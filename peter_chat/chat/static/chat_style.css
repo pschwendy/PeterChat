@@ -4,6 +4,13 @@
 	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif; 
 }
 
+#back {
+	filter: brightness(50%);
+	object-fit: cover;
+	position: relative;
+	height: 100vh;
+	width: 100%;
+}
 body {
 	height: 100%;
 	place-items: center
@@ -14,10 +21,15 @@ html{
 	height: 100%;
 	place-items: center;
 	display: grid;
-	background-color: #D0FFB7;
+	/*background-color: #D0FFB7;*/
+	/*background-image: url("")*/
 }
 
 #chat-box{
+	position: absolute;
+	top: 50%;
+	left:50%;
+	transform: translate(-50%, -50%);
 	display: grid;
 	grid:
 		"search-box chat-title" 65px

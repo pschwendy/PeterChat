@@ -1,4 +1,5 @@
 import json
+from django.db import models
 from .models import User, Message, Chat, Participant
 from channels.db import database_sync_to_async
 from asgiref.sync import async_to_sync
@@ -49,11 +50,17 @@ def send_message(chat_pk, user, msg, img, time):
     current_chat = Chat.objects.get(pk=chat_pk)
     message = Message.objects.create(
         sender = user,
-        chat = current_chat,
+        #chat = current_chat,
         content = msg,
         image = img,
         timestamp = time
     )
+    current_chat = Chat.objects.get(pk=chat_pk)
+    current_chat.messages.add(message)
+    current_chat.most_recent_time = time
+    print(time)
+    print(current_chat.most_recent_time)
+    current_chat.save()
     return
     # current_chat = Chat.objects.get(pk=chat_pk)
     # current_chat.messages.add(message)
@@ -81,10 +88,11 @@ def authenticate(username_in, room):
 def get_chats(user):
     # Participant.objects.all().delete()
     # Chat.objects.all().delete()
-    chats = Chat.objects.filter(participants__pk=user.pk)##.order_by("messages__timestamp")#.order_by("-message__timestamp")
+    chats = Chat.objects.filter(participants__pk=user.pk).order_by("-most_recent_time")#.order_by("message_set__timestamp")##.order_by("messages__timestamp")#.order_by("-message__timestamp")
+    #current_chats = chats.distinct("pk")
     chats_json = serializers.serialize('json', chats)
     loaded_chats = json.loads(chats_json)
-    print(f'chat: {loaded_chats[0]}')
+    print(f'count: {chats}')
     sliced = user.username
     for chat in loaded_chats:
         print(chat['fields']['chat_name'].index(sliced))
@@ -106,9 +114,10 @@ def get_current_messages(room):
     print(f'room: {room}')
     try:
         current_chat = Chat.objects.get(pk=room)
-        #current_messages = current_chat.messages.all().order_by("-timestamp")
-        current_messages = current_chat.message_set.all().order_by("-timestamp")
+        current_messages = current_chat.messages.all().order_by("-timestamp")
+        #current_messages = current_chat.message_set.all().order_by("-timestamp")
         messages_json = serializers.serialize('json', current_messages[:20])
+        print(messages_json)
         loaded_messages = json.loads(messages_json)  
         
         return loaded_messages
