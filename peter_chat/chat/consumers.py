@@ -3,7 +3,7 @@ from datetime import datetime
 #from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.auth import login
-from .queries import search_userbase, authenticate, search_chatbase, add_chat, get_chats, send_message, get_current_messages
+from .queries import search_userbase, authenticate, search_chatbase, add_chat, get_chats, send_message, get_current_messages, get_top_messages, get_new_messages
 from channels.db import database_sync_to_async
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -66,7 +66,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             user = await authenticate(user_login, self.room_name)
             await login(self.scope, user)
             await database_sync_to_async(self.scope["session"].save)()
-            print("HI!")
+            self.top_messages = await get_top_messages(user)
+            print(self.top_messages)
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -154,3 +155,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'messages': messages,
             'pk': pk
         }))
+
+    async def update_chats(self):
+        new_messages = get_new_messages(self.scope['user'], self.top_messages)
+        if len(new_messages) > 0:
+            print('new_messages to send')

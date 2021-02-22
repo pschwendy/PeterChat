@@ -151,13 +151,14 @@
 					const msgHtmlEnd = '</div>'
 					const timeHtml = '<div class="message-time">';
 					const timeHtmlEng = '</div>';
-					const containerEnd = '</div></div>';
+					const containerEnd = '</div></div></div>';
 					let load = true;
 					function loadMessage(message, username){
 						if (message.sender != username) {
 							msgHtml = '<div class="message-row received-message">\
 								<div class="message-content">\
 									<img src="th.jpg" alt="Katya Schwendeman" class="profile-pic">\
+									<div class="message-list">\
 									<div class="message-text">'
 							var endOfContainer = '';
 							endOfContainer = timeHtml + timeHtml + timeHtmlEng + containerEnd;
@@ -438,7 +439,7 @@
 						chatSocket.sendMessage(msg);
 						msgHtml = '<div class="message-row sent-message">\
 									<div class="message-content">\
-									<div class="message-text">'
+										<div class="message-list"><div class="message-text">'
 						var endOfContainer = '';
 						endOfContainer = timeHtml + timeHtml + timeHtmlEng + containerEnd;
 						$('#conversation').prepend(msgHtml + msg + msgHtmlEnd + endOfContainer);

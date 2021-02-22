@@ -5,15 +5,28 @@ from channels.db import database_sync_to_async
 from asgiref.sync import async_to_sync
 from django.core import serializers
 
+# saves sign up form into database
+# input: form -> sign up form,
+# contains username, password, first name, last name
 def signup(form):
     form.save()
+    # signup
 
+# logins user into chatting app
+# returns True if user exists given username and password
+# returns False otherwise
+# input: username_in -> username input
+# input: password_in -> password input
 def login(username_in, password_in):
     account = User.objects.filter(username = username_in, password = password_in)
     if account.exists():
         return True
     return False
+    # login
 
+# creates new chat given participants and current user
+# input: participants_in -> participants to be in chat (aside from user creating chat)
+# input: user -> (current) user creating chat
 @database_sync_to_async
 def add_chat(participants_in, user):
     name = ""
@@ -34,23 +47,32 @@ def add_chat(participants_in, user):
     chat_create.save()
 
     return chat_create
+    # add_chat
 
+# searches chatbase to see if (private) chat exists
+# returns True if it exists, False otherwise
+# input: participants_in -> array containing one participant in chat
+# input: user -> (current) user searching for chat
 @database_sync_to_async
 def search_chatbase(participants_in, user):
     print(participants_in[0]['pk'])
     account = Chat.objects.filter(private=True).filter(participants__pk=participants_in[0]['pk']).filter(participants__pk=user.pk)
     if account.exists():
-        print("returning account")
         return account[0]
-    print("hello")
     return False
+    # search_chatbase
 
+# adds messages being sent to database
+# input: chat_pk -> primary key of chat
+# input: user -> current user (scope from consumer class)
+# input: msg -> content of message being sent
+# input: img -> optional image inside message
+# input: time -> time of being being sent
 @database_sync_to_async
 def send_message(chat_pk, user, msg, img, time):
     current_chat = Chat.objects.get(pk=chat_pk)
     message = Message.objects.create(
         sender = user,
-        #chat = current_chat,
         content = msg,
         image = img,
         timestamp = time
@@ -58,20 +80,26 @@ def send_message(chat_pk, user, msg, img, time):
     current_chat = Chat.objects.get(pk=chat_pk)
     current_chat.messages.add(message)
     current_chat.most_recent_time = time
-    print(time)
-    print(current_chat.most_recent_time)
     current_chat.save()
     return
-    # current_chat = Chat.objects.get(pk=chat_pk)
-    # current_chat.messages.add(message)
-    # current_chat.save()
+    # send_message
 
+# checks if there is a user in the database with a username 
+# that starts with username being typed
+# input: username -> username being searched
+# input: user -> current user (scope from consumer class)
 @database_sync_to_async
 def search_userbase(username, user):
     searched_users = User.objects.filter(username__startswith=username).exclude(pk = user.pk)
     users_json = serializers.serialize('json', searched_users)
     return users_json
+    # search_chatbase
 
+# authenticates user
+# checks if user is in database
+# checks if user is a participant in chat given room
+# input: username_in -> username of user (scope from consumer class)
+# input: room -> current room (member of consumer class)
 @database_sync_to_async
 def authenticate(username_in, room):
     account = User.objects.filter(username = username_in)
@@ -83,7 +111,10 @@ def authenticate(username_in, room):
         print(account[0])
         return account[0]
     return False
+    # authenticate
 
+# returns user's chats ordered by most recent message in each chat
+# input: user -> current user (scope from consumer class)
 @database_sync_to_async
 def get_chats(user):
     # Participant.objects.all().delete()
@@ -106,7 +137,10 @@ def get_chats(user):
     # print(len(loaded_chats))
     # print(f'loaded chats: {loaded_chats}')
     return loaded_chats
+    # get_chats
 
+# gets chat messages given chat room
+# input: room -> current room (member of consumer class)
 @database_sync_to_async
 def get_current_messages(room):
     # Participant.objects.all().delete()
@@ -122,5 +156,40 @@ def get_current_messages(room):
         
         return loaded_messages
     except:
-        return False
+        return False 
+        # get_current_messages
     
+# gets most recent messages in every chat
+# input: user -> current user (scope from consumer class)
+@database_sync_to_async
+def get_top_messages(user):
+    user_chats = Chat.objects.filter(participants__pk=user.pk).order_by("pk")
+    top_messages = []
+    for chat in user_chats:
+        queryset = chat.messages.all().order_by("-timestamp")
+        if queryset.exists():
+            top_messages.append(queryset[0])
+            print(f'top message of chat {chat.pk} is {queryset[0].content}')
+    return top_messages 
+    # get_top_messages
+
+# gets most recent messages in every chat
+# compares them to current top messages to check for new messages
+# returns any new messages
+# input: user -> current user (scope from consumer class)
+# input: top_messages -> current top_messages
+@database_sync_to_async
+def get_new_messages(user, top_messages):
+    user_chats = Chat.objects.filter(participants__pk=user.pk).order_by("pk")
+    new_messages = []
+    for chat, message in user_chats, top_messages:
+        queryset = chat.messages.all().order_by("-timestamp")
+        if not queryset.exists():
+            continue
+        latest = queryset[0]
+        if latest.timestamp > message.timestamp:
+            message = serializers.serialize('json', latest)
+            new_messages.append(latest)
+    loaded_messages = json.loads(new_messages)
+    return loaded_messages 
+    # get_new_messages

@@ -1,22 +1,9 @@
-
-/*const roomName = JSON.parse(document.getElementById('room-name').textContent);
-const username = JSON.parse(document.getElementById('username').textContent);
-const chatSocket = new WebSocket(
-    'ws://'
-    + window.location.host
-    + '/ws/chat/'
-    + roomName
-    + '/'
-);
-var newChatMembers = [];
-var msgHtml = '';
-var msgHtmlEnd = '</div>'
-var timeHtml = '<div class="message-time">'
-var timeHtmlEng = '</div>'
-var containerEnd = '</div>\
-    </div>';*/
-
+// Class for managing chat web sockets
 class ChatSocket {
+    // constructor
+    // connects to websocket given room name
+    // input: roomName -> chat room (id)
+    // input: username -> logged in user's username
     constructor(roomName, username) {
         this.socket = new WebSocket(
             'ws://'
@@ -51,22 +38,27 @@ class ChatSocket {
         this.socket.onclose = function(e) {
             console.log('Chat socket closed unexpectedly');
         };
-    }
+    } // constructor
 
+    // send message to server
+    // input: msg -> message being sent
     sendMessage(msg) {
         this.socket.send(JSON.stringify({
             'send_type': 'chat_message',
             'message': msg,
         }));
-    }
+    } // sendMessage
 
+    // tells server to find/create chat given members
+    // input: newChatMembers -> members being searched
     findChat(newChatMembers) {
         this.socket.send(JSON.stringify({
             'send_type': 'find_create',
             'participants': newChatMembers
         }));
-    }
-
+    } // findChat
+    
+    // useless function LOL
     updateSocket(roomName) {
         this.socket = new WebSocket(
             'ws://'
@@ -76,4 +68,4 @@ class ChatSocket {
             + '/'
         );
     }
-};
+}; // ChatSocket
