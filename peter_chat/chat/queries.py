@@ -151,14 +151,33 @@ def get_current_messages(room):
         current_messages = current_chat.messages.all().order_by("-timestamp")
         #current_messages = current_chat.message_set.all().order_by("-timestamp")
         messages_json = serializers.serialize('json', current_messages[:20])
-        print(messages_json)
         loaded_messages = json.loads(messages_json)  
         
         return loaded_messages
     except:
-        return False 
+        return False
         # get_current_messages
-    
+
+@database_sync_to_async
+def grab_messages(room, num_loaded_messages):
+    try:
+        current_chat = Chat.objects.get(pk=room)
+        current_messages = current_chat.messages.all().order_by("-timestamp")
+        if num_loaded_messages >= len(current_messages):
+            return
+        to_load = num_loaded_messages * 2
+        if to_load / 2 > 100:
+            to_load = num_loaded_messages + 100
+        if to_load > len(current_messages):
+            to_load = len(current_messages)
+        messages_json = serializers.serialize('json', current_messages[num_loaded_messages:to_load])
+        num_loaded_messages = to_load
+        loaded_messages = json.loads(messages_json)
+        return loaded_messages
+    except:
+        return False 
+        # grab_messages
+ 
 # gets most recent messages in every chat
 # input: user -> current user (scope from consumer class)
 @database_sync_to_async

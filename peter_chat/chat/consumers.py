@@ -3,12 +3,12 @@ from datetime import datetime
 #from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.auth import login
-from .queries import search_userbase, authenticate, search_chatbase, add_chat, get_chats, send_message, get_current_messages, get_top_messages, get_new_messages
+from .queries import search_userbase, authenticate, search_chatbase, add_chat, get_chats, send_message, get_current_messages, get_top_messages, get_new_messages, grab_messages
 from channels.db import database_sync_to_async
 import time
 import threading
 import asyncio
-import sys
+from django.core import serializers
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -46,7 +46,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             if self.disconnected:
                 print('...........disconnecting thread.........')
                 break
-            print("running...")
+            # print("running...")
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
 
@@ -67,6 +67,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 {
                     'type': 'chat_message',
                     'message': message,
+                }
+            )
+        elif receive_type == 'fetch_messages':
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'fetch_messages',
                 }
             )
         elif receive_type == 'search':
@@ -167,6 +174,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def get_user_chats(self, event):
         chats = await get_chats(self.scope["user"])
         messages = await get_current_messages(self.room_name)
+        self.num_loaded_messages = 20
         #print("HI!")
         pk = self.scope["user"].pk
         await self.send(text_data=json.dumps({
@@ -177,12 +185,26 @@ class ChatConsumer(AsyncWebsocketConsumer):
         }))
 
     async def get_chat_messages(self, event):
+        print('yo')
         messages = await get_current_messages(self.room_name)
+        print('yoyo')
+        #self.message_history = history
+        
+        print(f'num loaded messages: {self.num_loaded_messages}')
         pk = self.scope["user"].pk
         print("...sending messages")
         await self.send(text_data=json.dumps({
             'send_type': 'load_messages',
             'messages': messages,
+            'pk': pk
+        }))
+
+    async def fetch_messages(self, event):
+        message_history = await grab_messages(self.room_name, self.num_loaded_messages)
+        pk = self.scope["user"].pk
+        await self.send(text_data=json.dumps({
+            'send_type': 'load_messages',
+            'messages': message_history,
             'pk': pk
         }))
 

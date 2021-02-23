@@ -40,6 +40,7 @@ class ChatSocket {
         this.socket.onclose = function(e) {
             console.log('Chat socket closed unexpectedly');
         };
+        this.fetchingMessages = false;
     } // constructor
 
     // send message to server
@@ -60,6 +61,12 @@ class ChatSocket {
         }));
     } // findChat
     
+    fetchMessages() {
+        this.socket.send(JSON.stringify({
+            'send_type': 'fetch_messages'
+        }));
+        this.fetchingMessages = true;
+    }
     // useless function LOL
     updateSocket(roomName) {
         this.socket = new WebSocket(

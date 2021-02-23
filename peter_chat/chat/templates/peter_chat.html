@@ -370,7 +370,54 @@
 						
 					}
 					function loadChatMessages(message, username){
-						
+						pk = message.pk;
+						console.log("...receiving messages")
+						for(var i = 0; i < message.messages.length; i++) {
+							var msg = message.messages[i];
+							var messageRow = document.createElement("div");
+
+							var messageContent = document.createElement("div");
+							messageContent.className = "message-content";
+
+							var messageSender = document.createElement("img");
+							messageSender.className = "profile-pic";
+							messageSender.src = "{% static 'th.jpg' %}";
+							
+							var messageList = document.createElement("div");
+							messageList.className = "message-list";
+							
+							var leadingMessage = document.createElement("div");
+							leadingMessage.className = "message-text";
+							leadingMessage.innerText = msg.fields.content;
+
+							if(msg.fields.sender == pk) {
+								messageRow.className = "message-row sent-message";
+							} else {
+								messageRow.className = "message-row received-message";
+								messageContent.appendChild(messageSender);
+							}
+							try {
+								messageList.appendChild(leadingMessage);
+								var nextMsg = message.messages[i+1];
+								console.log(nextMsg.fields);
+								while(msg.fields.sender == nextMsg.fields.sender) {
+									msg = message.messages[i+1];
+									var nextMessage = document.createElement("div");
+									nextMessage.className = "message-text";
+									nextMessage.innerText = msg.fields.content;
+									
+									messageList.prepend(nextMessage);
+									++i;
+									nextMsg = message.messages[i+1];
+								}
+							}
+							catch {
+								console.log("No more messages!");
+							}
+							messageContent.appendChild(messageList);
+							messageRow.appendChild(messageContent);
+							document.getElementById('conversation').appendChild(messageRow);
+						}
 					}
 					//$(function () {
 					var roomName = JSON.parse(document.getElementById('room-name').textContent);
@@ -412,8 +459,9 @@
 						var middle = $("#conversation").height()/2;
 						//console.log("middle" + middle);
 						//console.log("position: " + pos);
-						if( position <= -middle){
+						if( position <= -middle && !chatSocket.fetchingMessages){
 							console.log("fetch more messages");
+							chatSocket.fetchMessages()
 						}
 
 					});
