@@ -166,6 +166,16 @@
 						}
 						$('#recent-message').text(message.message);
 					}
+					function updateChatList(message) {
+						const messages = message.messages;
+						const pks = message.pks;
+						for(var i = 0; i < messages.length; i++) {
+							console.log('got pk: ' + pks[i]);
+							//chat = document.getElementById(pks[i]);
+							$('#' + pks[i]).find('.recent-message')[0].innerHTML = messages[i].fields.content;
+							$('#' + pks[i]).prependTo("#chat-list");
+						}
+					}
 					function findPeople(message, username){
 						document.getElementById('searches').textContent = '';
 						const users = JSON.parse(message.users);
@@ -353,6 +363,7 @@
 							chatDiv.onclick = function() {
 								switchChat(chatID);
 							};
+							chatDiv.id = chatID;
 							$("#chat-list").append(chatDiv);
 							console.log("PEW");
 						}

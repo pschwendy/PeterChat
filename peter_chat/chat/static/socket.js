@@ -18,13 +18,15 @@ class ChatSocket {
             console.log(message.send_type)
             if (message.send_type == 'chat') {
                 // load message
-                loadMessage(message, username)
+                loadMessage(message, username);
+            } else if (message.send_type == 'new_messages') {
+                updateChatList(message);
             } else if (message.send_type == 'search') {
                 // display people
-                findPeople(message, username)
+                findPeople(message, username);
             } else if (message.send_type == 'switch') {
                 // switch chats
-                switchChat(JSON.parse(message.chat))
+                switchChat(JSON.parse(message.chat));
             } else if (message.send_type == 'load') {
                 // load chats
                 console.log("...loading chats...");
@@ -32,7 +34,7 @@ class ChatSocket {
             } else if(message.send_type == 'load_messages') {
                 // load messages
                 console.log("pk: " + message.pk);
-                loadChatMessages(message, username)
+                loadChatMessages(message, username);
             }
         };
         this.socket.onclose = function(e) {

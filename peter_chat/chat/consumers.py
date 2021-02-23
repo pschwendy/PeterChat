@@ -5,6 +5,10 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.auth import login
 from .queries import search_userbase, authenticate, search_chatbase, add_chat, get_chats, send_message, get_current_messages, get_top_messages, get_new_messages
 from channels.db import database_sync_to_async
+import time
+import threading
+import asyncio
+import sys
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -23,10 +27,33 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         # Leave room group
         print("DONE")
+        self.disconnected = True
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
+    
+    async def send_for_updates(self):
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'update_chats',
+            }
+        )
+    def start_updates(self):
+        print("CONNECTED")
+        while True:
+            if self.disconnected:
+                print('...........disconnecting thread.........')
+                break
+            print("running...")
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
+            loop.run_until_complete(self.send_for_updates())
+            loop.close()
+
+            time.sleep(0.5)
 
     # Receive message from WebSocket
     async def receive(self, text_data):
@@ -74,6 +101,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'type': 'get_user_chats'
                 }
             )
+            self.disconnected = False
+            thread = threading.Thread(target=self.start_updates)
+            thread.start()
 
     # Receive message from room group
     async def chat_message(self, event):
@@ -156,7 +186,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'pk': pk
         }))
 
-    async def update_chats(self):
-        new_messages = get_new_messages(self.scope['user'], self.top_messages)
+    async def update_chats(self, event):
+        new_messages, updated_chats, new_top = await get_new_messages(self.scope['user'], self.top_messages)
+        self.top_messages = new_top
         if len(new_messages) > 0:
-            print('new_messages to send')
+            print(f'sending {new_messages} and {updated_chats}')
+            await self.send(text_data=json.dumps({
+                'send_type': 'new_messages',
+                'messages': new_messages,
+                'pks': updated_chats
+            }))
+    

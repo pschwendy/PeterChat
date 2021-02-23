@@ -164,12 +164,15 @@ def get_current_messages(room):
 @database_sync_to_async
 def get_top_messages(user):
     user_chats = Chat.objects.filter(participants__pk=user.pk).order_by("pk")
+    ##print(f'old set of chats: {user_chats}')
     top_messages = []
     for chat in user_chats:
         queryset = chat.messages.all().order_by("-timestamp")
         if queryset.exists():
             top_messages.append(queryset[0])
-            print(f'top message of chat {chat.pk} is {queryset[0].content}')
+            #print(f'top message of chat {chat.pk} is {queryset[0].content}')
+        else:
+            top_messages.append(None)
     return top_messages 
     # get_top_messages
 
@@ -181,15 +184,27 @@ def get_top_messages(user):
 @database_sync_to_async
 def get_new_messages(user, top_messages):
     user_chats = Chat.objects.filter(participants__pk=user.pk).order_by("pk")
+    #print(f'new set of chats: {user_chats}')
+    new_top = []
     new_messages = []
-    for chat, message in user_chats, top_messages:
+    updated_chats = []
+    for counter in range(0, len(top_messages)):
+        chat = user_chats[counter]
+        message = top_messages[counter]
         queryset = chat.messages.all().order_by("-timestamp")
         if not queryset.exists():
+            new_top.append(None)
             continue
         latest = queryset[0]
+        new_top.append(latest)
+        #print(f'comparing latest: {latest.timestamp} at {latest.pk} to top: {message.timestamp} at {message.pk}')
         if latest.timestamp > message.timestamp:
-            message = serializers.serialize('json', latest)
+            #message = serializers.serialize('json', latest)
             new_messages.append(latest)
-    loaded_messages = json.loads(new_messages)
-    return loaded_messages 
+            updated_chats.append(chat.pk)
+    new_messages_json = serializers.serialize('json', new_messages)
+    loaded_messages = json.loads(new_messages_json)
+    #print(f'top messages: {top_messages}')
+    #print(f'new messages: {loaded_messages}')
+    return loaded_messages, updated_chats, new_top
     # get_new_messages
