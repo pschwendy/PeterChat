@@ -1,9 +1,9 @@
 import json
 from datetime import datetime
-#from asgiref.sync import async_to_sync
+from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.auth import login
-from .queries import search_userbase, authenticate, search_chatbase, add_chat, get_chats, send_message, get_current_messages, get_top_messages, get_new_messages, grab_messages
+from .queries import search_userbase, authenticate, search_chatbase, add_chat, get_chats, send_message, get_current_messages, get_top_messages, get_new_messages, grab_messages, json_load_top_messages
 from channels.db import database_sync_to_async
 import time
 import threading
@@ -100,12 +100,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
             user = await authenticate(user_login, self.room_name)
             await login(self.scope, user)
             await database_sync_to_async(self.scope["session"].save)()
-            self.top_messages = await get_top_messages(user)
+            self.top_messages, chats_by_pk = await get_top_messages(user)
             print(self.top_messages)
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
-                    'type': 'get_user_chats'
+                    'type': 'get_user_chats',
+                    'chat_list': chats_by_pk
                 }
             )
             self.disconnected = False
@@ -177,10 +178,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.num_loaded_messages = 20
         #print("HI!")
         pk = self.scope["user"].pk
+        chats_by_pk = event['chat_list']
+        top_messages = await json_load_top_messages(self.top_messages, chats_by_pk)
         await self.send(text_data=json.dumps({
             'send_type': 'load',
             'chats': chats,
             'messages': messages,
+            'top_messages': top_messages,
             'pk': pk
         }))
 

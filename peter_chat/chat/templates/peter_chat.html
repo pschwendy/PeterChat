@@ -5,7 +5,7 @@
 		<script src="https://code.jquery.com/jquery-git.js"></script>
 		<meta charset="utf-8" />
 		<title>PeterChat</title>
-		<link rel="stylesheet" type="text/css" media="screen" href="{% static 'chat_style.css' %}"/>
+		<link rel="stylesheet" type="text/css" media="screen" href="{% static 'style.css' %}"/>
 		<link href="server.js"/>
 		<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
     	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
@@ -153,6 +153,54 @@
 					const timeHtmlEng = '</div>';
 					const containerEnd = '</div></div></div>';
 					let load = true;
+					function handleTime(timestamp) {
+						
+						const currentDate = new Date();
+						var timeSince = '';
+						totalTimePassed = Math.floor(Math.floor((currentDate.getTime() - timestamp.getTime())/1000)/60);
+						if (totalTimePassed/(60*24) > 365) {
+							timeSince = (timestamp.getMonth() + 1) + ' ' + timestamp.getDate() + ' ,' + timestamp.getFullYear()
+						} else if (totalTimePassed/(60*24) > 6) {
+							timeSince = (timestamp.getMonth() + 1) + ' ' + timestamp.getDate()
+						} else if (totalTimePassed/(60) > 24) {
+							switch(timestamp.getDay()){
+								case 0:
+									timeSince = 'Sun';
+									break;
+								case 1:
+									timeSince = 'Mon';
+									break;
+								case 2:
+									timeSince = 'Tue';
+									break;
+								case 3:
+									timeSince = 'Wed';
+									break;
+								case 4:
+									timeSince = 'Thu';
+									break;
+								case 5:
+									timeSince = 'Fri';
+									break;
+								case 6:
+									timeSince = 'Sat';
+									break;
+								default:
+									break;
+							}
+						} else if (Math.floor(totalTimePassed/(60)) > 0) {
+							var ampm = (timestamp.getHours() >= 12) ? " PM" : " AM";
+							let hello = (timestamp.getHours()-12).toString() + ":" + timestamp.getMinutes();
+							console.log(hello);
+							const ampmHour = (timestamp.getHours() <= 12) ? (timestamp.getHours()).toString() + ":" + timestamp.getMinutes() : hello;
+							timeSince = ampmHour + ampm;
+						} else if (totalTimePassed > 0) {
+							timeSince = Math.floor(totalTimePassed + ' min');
+						} else {
+							timeSince = 'Now';
+						}
+						return timeSince;
+					}
 					function loadMessage(message, username){
 						if (message.sender != username) {
 							msgHtml = '<div class="message-row received-message">\
@@ -271,9 +319,11 @@
 
 							if(msg.fields.sender == pk) {
 								messageRow.className = "message-row sent-message";
+								leadingMessage.style = "border-radius: 15px 0 15px 15px !important;";
 							} else {
 								messageRow.className = "message-row received-message";
 								messageContent.appendChild(messageSender);
+								leadingMessage.style = "border-radius: 0 15px 15px 15px !important;";
 							}
 							try {
 								messageList.appendChild(leadingMessage);
@@ -293,7 +343,13 @@
 							catch {
 								console.log("No more messages!");
 							}
+							var messageListTime = document.createElement("div");
+							messageListTime.className = "message-time";
+							var timestamp = new Date(msg.fields.timestamp)
+							messageListTime.innerText = handleTime(timestamp);
+
 							messageContent.appendChild(messageList);
+							messageContent.appendChild(messageListTime);
 							messageRow.appendChild(messageContent);
 							document.getElementById('conversation').appendChild(messageRow);
 							//!--------------------------
@@ -344,14 +400,16 @@
 							if(chat.pk == roomName) {
 								$('#chat-title').text(chatName);
 							}
-
+							const chatID = chat.pk;
 							var lastMessage = document.createElement("div");
 							lastMessage.className = "recent-message";
-							lastMessage.innerHTML = "hi";
+							lastMessage.innerHTML = message.top_messages[chatID].fields.content;
 
 							var lastMessageDate = document.createElement("div");
 							lastMessageDate.className = "message-date";
-							lastMessageDate.innerHTML = "Active Dec 10";
+							var timestamp = new Date(message.top_messages[chatID].fields.timestamp)
+							//console.log(timestamp)
+							lastMessageDate.innerHTML = handleTime(timestamp);
 
 							var chatDiv = document.createElement("div");
 							chatDiv.className = "chat";
@@ -359,7 +417,7 @@
 							chatDiv.appendChild(usernameDiv);
 							chatDiv.appendChild(lastMessage);
 							chatDiv.appendChild(lastMessageDate);
-							const chatID = chat.pk;
+							
 							chatDiv.onclick = function() {
 								switchChat(chatID);
 							};
@@ -392,9 +450,11 @@
 
 							if(msg.fields.sender == pk) {
 								messageRow.className = "message-row sent-message";
+								leadingMessage.style = "border-radius: 15px 0 15px 15px !important;";
 							} else {
 								messageRow.className = "message-row received-message";
 								messageContent.appendChild(messageSender);
+								leadingMessage.style = "border-radius: 0 15px 15px 15px !important;";
 							}
 							try {
 								messageList.appendChild(leadingMessage);
@@ -414,7 +474,13 @@
 							catch {
 								console.log("No more messages!");
 							}
+							var messageListTime = document.createElement("div");
+							messageListTime.className = "message-time";
+							var timestamp = new Date(msg.fields.timestamp)
+							messageListTime.innerText = handleTime(timestamp);
+
 							messageContent.appendChild(messageList);
+							messageContent.appendChild(messageListTime);
 							messageRow.appendChild(messageContent);
 							document.getElementById('conversation').appendChild(messageRow);
 						}
@@ -450,6 +516,7 @@
 							}));
 						}
 						$('#conversation').html('');
+						$('#chat-title').html('');
 						console.log('switching...');
 					}
 					$("#conversation").scroll(function(){

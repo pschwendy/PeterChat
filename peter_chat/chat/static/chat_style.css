@@ -168,7 +168,7 @@ html{
 
 .sent-message .message-list > .message-text{
 	background: #3FEE5F;
-	border-radius: 15px 0 15px 15px;
+	border-radius: 15px 0 0 15px;
 }
 .sent-message{
 	justify-content: end;

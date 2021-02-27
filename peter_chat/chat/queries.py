@@ -2,7 +2,7 @@ import json
 from django.db import models
 from .models import User, Message, Chat, Participant
 from channels.db import database_sync_to_async
-from asgiref.sync import async_to_sync
+from asgiref.sync import async_to_sync, sync_to_async
 from django.core import serializers
 
 # saves sign up form into database
@@ -185,14 +185,16 @@ def get_top_messages(user):
     user_chats = Chat.objects.filter(participants__pk=user.pk).order_by("pk")
     ##print(f'old set of chats: {user_chats}')
     top_messages = []
+    chats_by_pk = []
     for chat in user_chats:
         queryset = chat.messages.all().order_by("-timestamp")
         if queryset.exists():
             top_messages.append(queryset[0])
+            chats_by_pk.append(chat.pk)
             #print(f'top message of chat {chat.pk} is {queryset[0].content}')
         else:
             top_messages.append(None)
-    return top_messages 
+    return top_messages, chats_by_pk
     # get_top_messages
 
 # gets most recent messages in every chat
@@ -227,3 +229,12 @@ def get_new_messages(user, top_messages):
     #print(f'new messages: {loaded_messages}')
     return loaded_messages, updated_chats, new_top
     # get_new_messages
+
+@sync_to_async
+def json_load_top_messages(messages, chats_by_pk):
+    top_json = serializers.serialize('json', messages)
+    loaded_top = json.loads(top_json)
+    top_message_dict = {}
+    for counter in range(0, len(chats_by_pk)):
+        top_message_dict[chats_by_pk[counter]] = loaded_top[counter]
+    return top_message_dict
