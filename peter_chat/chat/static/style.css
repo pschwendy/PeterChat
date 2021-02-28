@@ -77,15 +77,23 @@ html{
 	height: 100%;
 }
 
-.chat{
+.chat, .searched-user{
 	display: grid;
-
 	font-size: 1.1rem;
 	grid-template-columns: 60px 1fr max-content;
-	grid-row-gap: 5px;
+	grid-row-gap: 5px;	
+	padding: 10px 10px 10px 5px;
+}
+
+.chat {
 	border-bottom: 1px solid #803790;
 	color: white;
-	padding: 10px 10px 10px 5px;
+}
+.searched-user {
+	border-bottom: 1px solid #dbdbdb;
+}
+.searched-user:hover {
+	background-color: #dbdbdb;
 }
 .chat:hover{
 	background-color: #803790;
@@ -267,7 +275,7 @@ html{
 
 #search-for{
 	display: block;
-	
+	color:black;
 }
 
 #search-grid {
@@ -317,7 +325,7 @@ html{
 }
 
 .selected{
-	background-color: #3FEE5F;
+	background-color: #dbdbdb;
 }
 
 .added-user{

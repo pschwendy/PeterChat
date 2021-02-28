@@ -153,15 +153,96 @@
 					const timeHtmlEng = '</div>';
 					const containerEnd = '</div></div></div>';
 					let load = true;
+					let newChatMembers = [];
 					function handleTime(timestamp) {
 						
 						const currentDate = new Date();
 						var timeSince = '';
 						totalTimePassed = Math.floor(Math.floor((currentDate.getTime() - timestamp.getTime())/1000)/60);
 						if (totalTimePassed/(60*24) > 365) {
-							timeSince = (timestamp.getMonth() + 1) + ' ' + timestamp.getDate() + ' ,' + timestamp.getFullYear()
+							switch(timestamp.getMonth()){
+								case 0:
+									timeSince = 'Jan';
+									break;
+								case 1:
+									timeSince = 'Feb';
+									break;
+								case 2:
+									timeSince = 'Mar';
+									break;
+								case 3:
+									timeSince = 'Apr';
+									break;
+								case 4:
+									timeSince = 'May';
+									break;
+								case 5:
+									timeSince = 'Jun';
+									break;
+								case 6:
+									timeSince = 'Jul';
+									break;
+								case 7:
+									timeSince = 'Aug';
+									break;
+								case 8:
+									timeSince = 'Sep';
+									break;
+								case 9:
+									timeSince = 'Oct';
+									break;
+								case 10:
+									timeSince = 'Nov';
+									break;
+								case 11:
+									timeSince = 'Dec';
+									break;
+								default:
+									break;
+							}
+							timeSince += ' ' + timestamp.getDate() + ' ,' + timestamp.getFullYear()
 						} else if (totalTimePassed/(60*24) > 6) {
-							timeSince = (timestamp.getMonth() + 1) + ' ' + timestamp.getDate()
+							switch(timestamp.getMonth()){
+								case 0:
+									timeSince = 'Jan';
+									break;
+								case 1:
+									timeSince = 'Feb';
+									break;
+								case 2:
+									timeSince = 'Mar';
+									break;
+								case 3:
+									timeSince = 'Apr';
+									break;
+								case 4:
+									timeSince = 'May';
+									break;
+								case 5:
+									timeSince = 'Jun';
+									break;
+								case 6:
+									timeSince = 'Jul';
+									break;
+								case 7:
+									timeSince = 'Aug';
+									break;
+								case 8:
+									timeSince = 'Sep';
+									break;
+								case 9:
+									timeSince = 'Oct';
+									break;
+								case 10:
+									timeSince = 'Nov';
+									break;
+								case 11:
+									timeSince = 'Dec';
+									break;
+								default:
+									break;
+							}
+							timeSince += ' ' + timestamp.getDate()
 						} else if (totalTimePassed/(60) > 24) {
 							switch(timestamp.getDay()){
 								case 0:
@@ -229,16 +310,25 @@
 						const users = JSON.parse(message.users);
 						for(var i = 0; i < users.length; ++i) {
 							const usernameReceived = users[i].fields.username;
-							const idReceived = users[i].fields.pk;
+							const idReceived = users[i].pk;
 							const user = users[i];
 
 							var userDiv = document.createElement("div");
-							userDiv.className = "chat inherit";
-							
-							if(newChatMembers.indexOf(idReceived) != -1){
+							userDiv.className = "searched-user inherit";
+							//console.log(newChatMembers.indexOf(user) != -1);
+							/*if(newChatMembers.indexOf(user) != -1){
 								userDiv.className += " selected";
+							}*/
+							console.log(newChatMembers);
+							for(chatMember of newChatMembers) {
+								console.log(chatMember.pk)
+								if(chatMember.pk == idReceived) {
+									console.log("IN HERE with " + chatMember.pk);
+									console.log("current id: " + idReceived);
+									userDiv.className += " selected";
+								}
 							}
-
+							console.log(user);
 							var userImg = document.createElement("img");
 							userImg.src = "{% static 'th.jpg' %}";
 							userImg.alt = "Katya Schwendeman";
@@ -250,7 +340,8 @@
 
 							var active = document.createElement("div");
 							active.className = "recent-message";
-							active.innerHTML = "Active Dec 10";
+							var timestamp = new Date(users[i].fields.last_login);
+							active.innerHTML = "Active " + handleTime(timestamp);
 
 							userDiv.appendChild(userImg);
 							userDiv.appendChild(usernameDiv);
@@ -259,7 +350,13 @@
 							userDiv.onclick = function(){
 								document.getElementById('searches').textContent = '';
 								if(userDiv.className.indexOf("selected") != -1) {
-									userDiv.className = "chat inherit";
+									for (var i = 0; i < newChatMembers.length; ++i) {
+										if(newChatMembers[i].pk == idReceived) {
+											newChatMembers.splice(i, i + 1);
+										}
+										console.log("NEWER CHAT MEMBERS: " + newChatMembers);
+									};
+									userDiv.className = "searched-user inherit";
 									document.getElementById(idReceived + "button").remove();
 									return;
 								}
@@ -277,12 +374,15 @@
 								close.className = "fa fa-times"
 								close.onclick = function() {
 									for (var i = 0; i < newChatMembers.length; ++i) {
-										if(newChatMembers[i].fields.pk == idReceived) {
-											newChatMembers.splice(i, i + 1);
+										console.log(idReceived);
+										if(newChatMembers[i].pk == idReceived) {
+											newChatMembers.splice(i, 1);
+											console.log("NEWER CHAT MEMBERS: " + newChatMembers);
 										}
 									};
+									console.log(idReceived);
 									document.getElementById(idReceived + "button").remove();
-									userDiv.className = "chat inherit";
+									userDiv.className = "searched-user inherit";
 								};
 
 								addedUser.appendChild(addedName);
