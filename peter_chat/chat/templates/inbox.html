@@ -1,0 +1,529 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="https://code.jquery.com/jquery-git.js"></script>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>PeterChat</title>
+		<link rel="stylesheet" type="text/css" media="screen" href="{% static 'style.css' %}"/>
+		<link href="server.js"/>
+		<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+		<script src="https://kit.fontawesome.com/3aa210e078.js" crossorigin="anonymous"></script>
+	</head>
+	<body>
+		<img id="back" src="{% static 'background.jpg' %}">
+		<div id="chat-box">
+			<div id="search-box">
+				<input type="button" value="Find People or Chats" data-toggle="modal" data-target="#find" onclick="readySearch()">
+			</div>
+			<div id="chat-list"></div>
+			<div id="profile">
+				<div id="prof-but" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<li role="listitem">
+						<div>
+							<div class="pic-holder">
+								<img id="my-pic" src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="">
+							</div>
+							<div id="profile-names">
+								<div id="profile-name">Full Name</div>
+								<div id="profile-username">username</div>
+							</div>
+						</div>
+					</li>
+				</div>
+				<div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+					<a class="dropdown-item" href="/logout">Logout</a>
+				</div>
+			</div>
+			<div id="chat-title"></div>
+			<div id="conversation"></div>
+			<div id="message">
+				{{ user_number|json_script:"room-name" }}
+				{{ username|json_script:"username" }}
+				<script>
+                    // Class for managing chat web sockets
+                    class ChatSocket {
+                        // constructor
+                        // connects to websocket given room name
+                        // input: roomName -> chat room (id)
+                        // input: username -> logged in user's username
+                        constructor(roomName, username) {
+                            this.socket = new WebSocket(
+                                'ws://'
+                                + window.location.host
+                                + '/ws/user/'
+                                + roomName
+                                + '/'
+                            );
+                            this.username = username;
+                            this.socket.onmessage = function(msg){
+                                const message = JSON.parse(msg.data);
+                                console.log(message.send_type)
+                                if (message.send_type == 'search') {
+                                    // display people
+                                    findPeople(message, username);
+                                } else if (message.send_type == 'switch') {
+                                    // switch chats
+                                    switchChat(JSON.parse(message.chat));
+                                } else if (message.send_type == 'load') {
+                                    // load chats
+                                    loadChats(message, username, roomName);
+                                }
+                            };
+                            this.socket.onclose = function(e) {
+                                console.log('Chat socket closed unexpectedly');
+                            };
+                            this.fetchingMessages = false;
+                        } // constructor
+
+                        // send message to server
+                        // input: msg -> message being sent
+                        sendMessage(msg) {
+                            this.socket.send(JSON.stringify({
+                                'send_type': 'chat_message',
+                                'message': msg,
+                            }));
+                        } // sendMessage
+
+                        // tells server to find/create chat given members
+                        // input: newChatMembers -> members being searched
+                        findChat(newChatMembers) {
+                            this.socket.send(JSON.stringify({
+                                'send_type': 'find_create',
+                                'participants': newChatMembers
+                            }));
+                        } // findChat
+                        
+                        fetchMessages() {
+                            this.socket.send(JSON.stringify({
+                                'send_type': 'fetch_messages'
+                            }));
+                            this.fetchingMessages = true;
+                        }
+                        // useless function LOL
+                        updateSocket(roomName) {
+                            this.socket = new WebSocket(
+                                'ws://'
+                                + window.location.host
+                                + '/ws/chat/'
+                                + roomName
+                                + '/'
+                            );
+                        }
+                    }; // ChatSocket
+					const msgHtmlEnd = '</div>'
+					const timeHtml = '<div class="message-time">';
+					const timeHtmlEng = '</div>';
+					const containerEnd = '</div></div></div>';
+					let load = true;
+					let newChatMembers = [];
+					function handleTime(timestamp) {
+						
+						const currentDate = new Date();
+						var timeSince = '';
+						totalTimePassed = Math.floor(Math.floor((currentDate.getTime() - timestamp.getTime())/1000)/60);
+						if (totalTimePassed/(60*24) > 365) {
+							console.log("YUP");
+							switch(timestamp.getMonth()){
+								case 0:
+									timeSince = 'Jan';
+									break;
+								case 1:
+									timeSince = 'Feb';
+									break;
+								case 2:
+									timeSince = 'Mar';
+									break;
+								case 3:
+									timeSince = 'Apr';
+									break;
+								case 4:
+									timeSince = 'May';
+									break;
+								case 5:
+									timeSince = 'Jun';
+									break;
+								case 6:
+									timeSince = 'Jul';
+									break;
+								case 7:
+									timeSince = 'Aug';
+									break;
+								case 8:
+									timeSince = 'Sep';
+									break;
+								case 9:
+									timeSince = 'Oct';
+									break;
+								case 10:
+									timeSince = 'Nov';
+									break;
+								case 11:
+									timeSince = 'Dec';
+									break;
+								default:
+									break;
+							}
+							timeSince += ' ' + timestamp.getDate() + ' ,' + timestamp.getFullYear()
+						} else if (totalTimePassed/(60*24) > 6) {
+							switch(timestamp.getMonth()){
+								case 0:
+									timeSince = 'Jan';
+									break;
+								case 1:
+									timeSince = 'Feb';
+									break;
+								case 2:
+									timeSince = 'Mar';
+									break;
+								case 3:
+									timeSince = 'Apr';
+									break;
+								case 4:
+									timeSince = 'May';
+									break;
+								case 5:
+									timeSince = 'Jun';
+									break;
+								case 6:
+									timeSince = 'Jul';
+									break;
+								case 7:
+									timeSince = 'Aug';
+									break;
+								case 8:
+									timeSince = 'Sep';
+									break;
+								case 9:
+									timeSince = 'Oct';
+									break;
+								case 10:
+									timeSince = 'Nov';
+									break;
+								case 11:
+									timeSince = 'Dec';
+									break;
+								default:
+									break;
+							}
+							timeSince += ' ' + timestamp.getDate()
+						} else if (totalTimePassed/(60) > 24) {
+							switch(timestamp.getDay()){
+								case 0:
+									timeSince = 'Sun';
+									break;
+								case 1:
+									timeSince = 'Mon';
+									break;
+								case 2:
+									timeSince = 'Tue';
+									break;
+								case 3:
+									timeSince = 'Wed';
+									break;
+								case 4:
+									timeSince = 'Thu';
+									break;
+								case 5:
+									timeSince = 'Fri';
+									break;
+								case 6:
+									timeSince = 'Sat';
+									break;
+								default:
+									break;
+							}
+						} else if (Math.floor(totalTimePassed/(60)) > 0) {
+							var ampm = (timestamp.getHours() >= 12) ? " PM" : " AM";
+							let hello = (timestamp.getHours()-12).toString() + ":" + timestamp.getMinutes();
+							console.log(hello);
+							const ampmHour = (timestamp.getHours() <= 12) ? (timestamp.getHours()).toString() + ":" + timestamp.getMinutes() : hello;
+							timeSince = ampmHour + ampm;
+						} else if (totalTimePassed > 0) {
+							timeSince = Math.floor(totalTimePassed) + ' min';
+						} else {
+							timeSince = 'Now';
+						}
+						return timeSince;
+					}
+					function findPeople(message, username){
+						document.getElementById('searches').textContent = '';
+						const users = JSON.parse(message.users);
+						for(var i = 0; i < users.length; ++i) {
+							const usernameReceived = users[i].fields.username;
+							const idReceived = users[i].pk;
+							const user = users[i];
+
+							var userDiv = document.createElement("div");
+							userDiv.className = "searched-user inherit";
+					
+							console.log(newChatMembers);
+							for(chatMember of newChatMembers) {
+								console.log(chatMember.pk)
+								if(chatMember.pk == idReceived) {
+									console.log("IN HERE with " + chatMember.pk);
+									console.log("current id: " + idReceived);
+									userDiv.className += " selected";
+								}
+							}
+							console.log(user);
+							var userImg = document.createElement("img");
+							userImg.src = "{% static 'th.jpg' %}";
+							userImg.alt = "Katya Schwendeman";
+							userImg.className = "profile-pic";
+
+							var usernameDiv = document.createElement("div");
+							usernameDiv.className = "chat-name";
+							usernameDiv.innerHTML = users[i].fields.username;
+
+							var active = document.createElement("div");
+							active.className = "recent-message";
+							var timestamp = new Date(users[i].fields.last_login);
+							active.innerHTML = "Active " + handleTime(timestamp);
+
+							userDiv.appendChild(userImg);
+							userDiv.appendChild(usernameDiv);
+							userDiv.appendChild(active);
+
+							userDiv.onclick = function(){
+								document.getElementById('searches').textContent = '';
+								if(userDiv.className.indexOf("selected") != -1) {
+									for (var i = 0; i < newChatMembers.length; ++i) {
+										if(newChatMembers[i].pk == idReceived) {
+											newChatMembers.splice(i, i + 1);
+										}
+										console.log("NEWER CHAT MEMBERS: " + newChatMembers);
+									};
+									userDiv.className = "searched-user inherit";
+									document.getElementById(idReceived + "button").remove();
+									return;
+								}
+								userDiv.className += " selected";
+								$('#searcher').val('');
+								
+								var addedUser = document.createElement("button");
+								addedUser.className = "added-user btn";
+								addedUser.id = idReceived + "button";
+
+								var addedName = document.createElement("span");
+								addedUser.innerHTML = usernameReceived;
+
+								var close = document.createElement("i");
+								close.className = "fa fa-times"
+								close.onclick = function() {
+									for (var i = 0; i < newChatMembers.length; ++i) {
+										console.log(idReceived);
+										if(newChatMembers[i].pk == idReceived) {
+											newChatMembers.splice(i, 1);
+											console.log("NEWER CHAT MEMBERS: " + newChatMembers);
+										}
+									};
+									console.log(idReceived);
+									document.getElementById(idReceived + "button").remove();
+									userDiv.className = "searched-user inherit";
+								};
+
+								addedUser.appendChild(addedName);
+								addedName.appendChild(close);
+
+								$("#search-for").prepend(addedUser);
+								newChatMembers.push(user);
+							};
+
+							$('#searches').append(userDiv);
+						}
+					}
+					function loadChats(message, username, roomName){	
+						$('#conversation').html('');
+						$('#profile-name').text(message.name);
+						$('#profile-username').text(username);
+						pk = message.pk;
+						$('#chat-list').html('');
+						const chats = message.chats;
+						for(var i = 0; i < chats.length; ++i) {
+							console.log("HELLO");
+							chat = chats[i];
+
+							var userImg = document.createElement("img");
+							userImg.src = "{% static 'th.jpg' %}";
+							userImg.alt = "Katya Schwendeman";
+							userImg.className = "profile-pic";
+
+							var usernameDiv = document.createElement("div");
+							usernameDiv.className = "chat-name";
+							var chatName = '';
+							const private = chat.fields.private == true;
+							if (!private == false && chat.fields.chat_name != '') {
+								chatName = chat.fields.chat_name;
+							} else {
+								for (var j = 0; j < chat.fields.participants.length; ++j) {
+									if (chat.fields.participants[j].fields.username == username) {
+										continue;
+									}
+									chatName += participant.fields.username;
+									if(j != chat.fields.participants.length - 1) {
+										chatName += + ", ";
+									}
+								}
+							}
+							usernameDiv.innerHTML = chatName;
+							if(chat.pk == roomName) {
+								$('#chat-title').text(chatName);
+							}
+							const chatID = chat.pk;
+							var lastMessage = document.createElement("div");
+							lastMessage.className = "recent-message";
+							lastMessage.innerHTML = message.top_messages[chatID].content;
+
+							var lastMessageDate = document.createElement("div");
+							lastMessageDate.className = "message-date";
+							var timestamp = new Date(message.top_messages[chatID].timestamp)
+							//console.log(timestamp)
+							lastMessageDate.innerHTML = handleTime(timestamp);
+
+							var chatDiv = document.createElement("div");
+							chatDiv.className = "chat";
+							chatDiv.appendChild(userImg);
+							chatDiv.appendChild(usernameDiv);
+							chatDiv.appendChild(lastMessage);
+							chatDiv.appendChild(lastMessageDate);
+							
+							chatDiv.onclick = function() {
+								switchChat(chatID);
+							};
+							chatDiv.id = chatID;
+							$("#chat-list").append(chatDiv);
+							console.log("PEW");
+						}
+					}
+					function loadChatMessages(message, username){
+						pk = message.pk;
+						console.log("...receiving messages")
+						for(var i = 0; i < message.messages.length; i++) {
+							var msg = message.messages[i];
+							var messageRow = document.createElement("div");
+
+							var messageContent = document.createElement("div");
+							messageContent.className = "message-content";
+
+							var messageSender = document.createElement("img");
+							messageSender.className = "profile-pic";
+							messageSender.src = "{% static 'th.jpg' %}";
+							
+							var messageList = document.createElement("div");
+							messageList.className = "message-list";
+							
+							var leadingMessage = document.createElement("div");
+							leadingMessage.className = "message-text";
+							leadingMessage.innerText = msg.fields.content;
+
+							if(msg.fields.sender == pk) {
+								messageRow.className = "message-row sent-message";
+								leadingMessage.style = "border-radius: 15px 0 15px 15px !important;";
+							} else {
+								messageRow.className = "message-row received-message";
+								messageContent.appendChild(messageSender);
+								leadingMessage.style = "border-radius: 0 15px 15px 15px !important;";
+							}
+							try {
+								messageList.appendChild(leadingMessage);
+								var nextMsg = message.messages[i+1];
+								console.log(nextMsg.fields);
+								while(msg.fields.sender == nextMsg.fields.sender) {
+									msg = message.messages[i+1];
+									var nextMessage = document.createElement("div");
+									nextMessage.className = "message-text";
+									nextMessage.innerText = msg.fields.content;
+									
+									messageList.prepend(nextMessage);
+									++i;
+									nextMsg = message.messages[i+1];
+								}
+							}
+							catch {
+								console.log("No more messages!");
+							}
+							var messageListTime = document.createElement("div");
+							messageListTime.className = "message-time";
+							var timestamp = new Date(msg.fields.timestamp)
+							messageListTime.innerText = handleTime(timestamp);
+
+							messageContent.appendChild(messageList);
+							messageContent.appendChild(messageListTime);
+							messageRow.appendChild(messageContent);
+							document.getElementById('conversation').appendChild(messageRow);
+						}
+					}
+					var roomName = JSON.parse(document.getElementById('room-name').textContent);
+					const userName = JSON.parse(document.getElementById('username').textContent);
+					var id = 0;
+					let chatSocket = new ChatSocket(roomName, userName);
+					function switchChat(id) {
+						const newUrl = '/chat/'
+						+ id
+						+ '/';
+                        $('#conversation').html('');
+						$('#chat-title').html('');
+                        console.log(window.location);
+                        window.location = "//" + window.location.host + newUrl;
+					}
+				</script>
+			</div>
+		</div>
+		<div class="modal fade" id="find" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div id="search-grid">
+						<div id="search-for">
+							<input type="text" id="searcher" placeholder="Find People to Chat!">
+						</div>
+					</div>
+					<script>
+						function readySearch(){
+							$("#search-for").val('');
+							document.getElementById('searches').textContent = '';
+							newChatMembers = [];
+							$('.added-user').remove();
+							
+						}
+						var searchTimeout;
+						document.getElementById('searcher').onkeypress = function () {
+							if (searchTimeout != undefined) clearTimeout(searchTimeout);
+							searchTimeout = setTimeout(callServerScript, 250);
+						};
+						document.getElementById('searcher').addEventListener('keydown', function (event) {
+							if (event.keyCode == 8 || event.keyCode == 46) {
+								if (searchTimeout != undefined) clearTimeout(searchTimeout);
+								searchTimeout = setTimeout(callServerScript, 250)
+							}
+						});
+						function callServerScript() {
+							var searched = $("#searcher").val();
+							if(searched == '') {
+								document.getElementById('searches').textContent = '';
+								return;
+							}
+							chatSocket.socket.send(JSON.stringify({
+								'send_type': 'search',
+								'username_searched': searched
+							}));
+						}
+						function findChat() {
+							chatSocket.findChat(newChatMembers);
+							newChatMembers.length = 0;
+						}
+					</script>
+					<div class="modal-body" id="searches">
+					</div>
+					<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" onclick="findChat()" data-dismiss="modal">Save changes</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

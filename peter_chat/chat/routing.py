@@ -5,5 +5,6 @@ from django.conf.urls import url
 from . import consumers
 
 websocket_urlpatterns = [
-    url(r'^ws/chat/(?P<room_name>[^/]+)/$', consumers.ChatConsumer.as_asgi()),
+    re_path(r'^ws/chat/(?P<room_name>[^/]+)/$', consumers.ChatConsumer.as_asgi()),
+    re_path(r'^ws/user/(?P<user_number>[^/]+)/$', consumers.InboxConsumer.as_asgi()),
 ]

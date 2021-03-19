@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'c4bpqn*2a&8d*b-dfnn@oevov=)dy_%5-1q^st5mv+0nz$3+2*'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'peter-chat.herokuapp.com']
 
 
 # Application definition
@@ -87,7 +87,7 @@ CHANNEL_LAYERS = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'chatdb',
+        'NAME': 'peterchatdb',
     }
 }
 

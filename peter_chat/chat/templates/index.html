@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>PeterChat</title>
     <script src="https://code.jquery.com/jquery-git.js"></script>
@@ -45,9 +45,9 @@
               <form method="POST" name = "login">
                 {% csrf_token %}
                 <div class="labeler">Username</div>
-                <input class="text-input" name = "username" id="username-login" type="text" placeholder="Username" required>
+                <input class="text-input" name = "username" autocomplete="off" id="username-login" type="text" placeholder="Username" required>
                 <div class="labeler">Password</div>
-                <input class="text-input" name = "password" id="password-login" type="password" placeholder="Password" required>
+                <input class="text-input" name = "password" autocomplete="off" id="password-login" type="password" placeholder="Password" required>
                 <div class="row">
                 </div>
               </form>
@@ -63,13 +63,13 @@
               <form method="POST" name="signup">
                 {% csrf_token %}
                 <div class="labeler">First Name</div>
-                <input class="text-input" name = "first_name" id="first-name" type="text" placeholder="First Name" value="{{ current_name }}" required>
+                <input class="text-input" name = "first_name" autocomplete="off" id="first-name" type="text" placeholder="First Name" value="{{ current_name }}" required>
                 <div class="labeler">Last Name</div>
-                <input class="text-input" name = "last_name" id="last-name" type="text" placeholder="Last Name" value="{{ current_name }}" required>
+                <input class="text-input" name = "last_name" autocomplete="off" id="last-name" type="text" placeholder="Last Name" value="{{ current_name }}" required>
                 <div class="labeler">Username</div>
-                <input class="text-input" name = "username" id="username-signup" type="text" placeholder="Username" value="{{ current_name }}" required>
+                <input class="text-input" name = "username" autocomplete="off" id="username-signup" type="text" placeholder="Username" value="{{ current_name }}" required>
                 <div class="labeler">Password</div>
-                <input class="text-input" name = "password" id="password-signup" type="password" placeholder="Password" value="{{ current_name }}" required>
+                <input class="text-input" name = "password" autocomplete="off" id="password-signup" type="password" placeholder="Password" value="{{ current_name }}" required>
               </form>
               <div class="labeler">Confirm Password</div>
                 <input class="text-input" name = "confirm_password" id="password-confirm" type="password" placeholder="Password" value="{{ current_name }}" required>
@@ -126,7 +126,7 @@
                       <div class="title">PeterChat</div>
                   </div>
               </div>
-              <p id="description">Description</p>
+              <p id="description">America's #1 chatting app!</p>
           </div>
       </main>
       </div>

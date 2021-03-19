@@ -24,6 +24,21 @@ def login(username_in, password_in):
     return False
     # login
 
+# authenticates user for inbox use
+# checks if user is in database and returns pk of user
+# input: username_in -> username input
+def get_user_pk(username_in):
+    account = User.objects.filter(username = username_in)
+    if account.exists():
+        return account[0].pk
+    return False
+    # authenticate
+
+@database_sync_to_async
+def get_full_name(user_pk):
+    account = User.objects.get(pk = user_pk)
+    return account.first_name + " " + account.last_name
+
 # creates new chat given participants and current user
 # input: participants_in -> participants to be in chat (aside from user creating chat)
 # input: user -> (current) user creating chat
@@ -39,7 +54,7 @@ def add_chat(participants_in, user):
         add_user = User.objects.get(id=user_in["pk"])
         chat_create.participants.add(add_user)
         name += add_user.username + ", "
-        print(f'adding user: {add_user}')
+        #print(f'adding user: {add_user}')
     this_user = User.objects.get(id=user.pk)
     chat_create.participants.add(this_user)
     name += this_user.username
@@ -55,7 +70,7 @@ def add_chat(participants_in, user):
 # input: user -> (current) user searching for chat
 @database_sync_to_async
 def search_chatbase(participants_in, user):
-    print(participants_in[0]['pk'])
+    #print(participants_in[0]['pk'])
     account = Chat.objects.filter(private=True).filter(participants__pk=participants_in[0]['pk']).filter(participants__pk=user.pk)
     if account.exists():
         return account[0]
@@ -81,7 +96,11 @@ def send_message(chat_pk, user, msg, img, time):
     current_chat.messages.add(message)
     current_chat.most_recent_time = time
     current_chat.save()
-    return
+    messages = []
+    messages.append(message)
+    messages_json = serializers.serialize('json', messages)
+    loaded_message = json.loads(messages_json)[0]
+    return loaded_message
     # send_message
 
 # checks if there is a user in the database with a username 
@@ -108,7 +127,18 @@ def authenticate(username_in, room):
         current_chat = Chat.objects.filter(participants__pk=account[0].pk).filter(pk=room)
         if not current_chat.exists():
             return False
-        print(account[0])
+        #print(account[0])
+        return account[0]
+    return False
+    # authenticate
+
+# authenticates user for inbox use
+# checks if user is in database
+# input: user_pk -> pk of user (user_number from consumer class)
+@database_sync_to_async
+def authenticate_inbox(user_pk):
+    account = User.objects.filter(pk = user_pk)
+    if account.exists():
         return account[0]
     return False
     # authenticate
@@ -123,19 +153,19 @@ def get_chats(user):
     #current_chats = chats.distinct("pk")
     chats_json = serializers.serialize('json', chats)
     loaded_chats = json.loads(chats_json)
-    print(f'count: {chats}')
+    #print(f'count: {chats}')
     sliced = user.username
     for chat in loaded_chats:
-        print(chat['fields']['chat_name'].index(sliced))
+        #print(chat['fields']['chat_name'].index(sliced))
         try:
             if chat['fields']['chat_name'].index(sliced + ", ") != -1:
                 chat['fields']['chat_name'] = chat['fields']['chat_name'].replace(sliced + ",", "")
         except:
-            print(chat['fields']['chat_name'].index(sliced))
+            #print(chat['fields']['chat_name'].index(sliced))
             chat['fields']['chat_name'] = chat['fields']['chat_name'].replace(", " + sliced, "")
     
-    # print(len(loaded_chats))
-    # print(f'loaded chats: {loaded_chats}')
+    # #print(len(loaded_chats))
+    # #print(f'loaded chats: {loaded_chats}')
     return loaded_chats
     # get_chats
 
@@ -145,7 +175,7 @@ def get_chats(user):
 def get_current_messages(room):
     # Participant.objects.all().delete()
     # Chat.objects.all().delete()
-    print(f'room: {room}')
+    #print(f'room: {room}')
     try:
         current_chat = Chat.objects.get(pk=room)
         current_messages = current_chat.messages.all().order_by("-timestamp")
@@ -164,7 +194,7 @@ def grab_messages(room, num_loaded_messages):
         current_chat = Chat.objects.get(pk=room)
         current_messages = current_chat.messages.all().order_by("-timestamp")
         if num_loaded_messages >= len(current_messages):
-            return
+            return False, num_loaded_messages
         to_load = num_loaded_messages * 2
         if to_load / 2 > 100:
             to_load = num_loaded_messages + 100
@@ -173,9 +203,10 @@ def grab_messages(room, num_loaded_messages):
         messages_json = serializers.serialize('json', current_messages[num_loaded_messages:to_load])
         num_loaded_messages = to_load
         loaded_messages = json.loads(messages_json)
-        return loaded_messages
+        return loaded_messages, num_loaded_messages
     except:
-        return False 
+        #print("EXCEPTION")
+        return False, num_loaded_messages
         # grab_messages
  
 # gets most recent messages in every chat
@@ -183,17 +214,18 @@ def grab_messages(room, num_loaded_messages):
 @database_sync_to_async
 def get_top_messages(user):
     user_chats = Chat.objects.filter(participants__pk=user.pk).order_by("pk")
-    ##print(f'old set of chats: {user_chats}')
+    ###print(f'old set of chats: {user_chats}')
     top_messages = []
     chats_by_pk = []
     for chat in user_chats:
         queryset = chat.messages.all().order_by("-timestamp")
+        chats_by_pk.append(chat.pk)
         if queryset.exists():
             top_messages.append(queryset[0])
-            chats_by_pk.append(chat.pk)
-            #print(f'top message of chat {chat.pk} is {queryset[0].content}')
+            ##print(f'top message of chat {chat.pk} is {queryset[0].content}')
         else:
             top_messages.append(None)
+        
     return top_messages, chats_by_pk
     # get_top_messages
 
@@ -205,7 +237,7 @@ def get_top_messages(user):
 @database_sync_to_async
 def get_new_messages(user, top_messages):
     user_chats = Chat.objects.filter(participants__pk=user.pk).order_by("pk")
-    #print(f'new set of chats: {user_chats}')
+    ##print(f'new set of chats: {user_chats}')
     new_top = []
     new_messages = []
     updated_chats = []
@@ -218,23 +250,39 @@ def get_new_messages(user, top_messages):
             continue
         latest = queryset[0]
         new_top.append(latest)
-        #print(f'comparing latest: {latest.timestamp} at {latest.pk} to top: {message.timestamp} at {message.pk}')
+        ##print(f'comparing latest: {latest.timestamp} at {latest.pk} to top: {message.timestamp} at {message.pk}')
         if latest.timestamp > message.timestamp:
             #message = serializers.serialize('json', latest)
             new_messages.append(latest)
             updated_chats.append(chat.pk)
     new_messages_json = serializers.serialize('json', new_messages)
     loaded_messages = json.loads(new_messages_json)
-    #print(f'top messages: {top_messages}')
-    #print(f'new messages: {loaded_messages}')
+    ##print(f'top messages: {top_messages}')
+    ##print(f'new messages: {loaded_messages}')
     return loaded_messages, updated_chats, new_top
     # get_new_messages
 
 @sync_to_async
 def json_load_top_messages(messages, chats_by_pk):
-    top_json = serializers.serialize('json', messages)
-    loaded_top = json.loads(top_json)
-    top_message_dict = {}
-    for counter in range(0, len(chats_by_pk)):
-        top_message_dict[chats_by_pk[counter]] = loaded_top[counter]
-    return top_message_dict
+    try:
+        """top_json = serializers.serialize('json', messages)
+        loaded_top = json.loads(top_json)"""
+        loaded_top = []
+        for message in messages:
+            if message == None:
+                loaded_message = {"content":"", "timestamp": ""}
+            else:
+                loaded_message = {"content": message.content, "timestamp": message.timestamp.isoformat()}#.strftime("%Y-%m-%dT%H:%M:%S.%G")}
+                ##print(message.timestamp.isoformat())#.strftime("%Y-%m-%dT%H:%M:%S.867Z"))
+            loaded_top.append(loaded_message)
+        #print(f"messages! {loaded_top}")
+        top_message_dict = {}
+        for counter in range(0, len(chats_by_pk)):
+            top_message_dict[chats_by_pk[counter]] = loaded_top[counter]
+        #print(f"RETURNING THESE TOP MESSAGES: {top_message_dict}")
+        return top_message_dict
+    except:
+        #print('uh oh')
+        return False
+
+    

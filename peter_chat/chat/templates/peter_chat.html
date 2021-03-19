@@ -3,12 +3,14 @@
 <html>
 	<head>
 		<script src="https://code.jquery.com/jquery-git.js"></script>
-		<meta charset="utf-8" />
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>PeterChat</title>
 		<link rel="stylesheet" type="text/css" media="screen" href="{% static 'style.css' %}"/>
 		<link href="server.js"/>
 		<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
     	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 		<script src="https://kit.fontawesome.com/3aa210e078.js" crossorigin="anonymous"></script>
 	</head>
@@ -74,7 +76,24 @@
 					<div class="message-date">Dec 10</div>
 				</div>--->
 			</div>
-			<div id="profile"></div>
+			<div id="profile" class="show dropup">
+				<div id="prof-but" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<li role="listitem">
+						<div>
+							<div class="pic-holder">
+								<img id="my-pic" src="{% static 'th.jpg' %}" alt="Katya Schwendeman" class="">
+							</div>
+							<div id="profile-names">
+								<div id="profile-name">Full Name</div>
+								<div id="profile-username">username</div>
+							</div>
+						</div>
+					</li>
+				</div>
+				<div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+					<a class="dropdown-item" href="/logout">Logout</a>
+				</div>
+			</div>
 			<div id="chat-title">
 				<!--<div class="row w-100">
 					<div class="col">Katya Schwendeman</div>
@@ -160,6 +179,7 @@
 						var timeSince = '';
 						totalTimePassed = Math.floor(Math.floor((currentDate.getTime() - timestamp.getTime())/1000)/60);
 						if (totalTimePassed/(60*24) > 365) {
+							console.log("YUP");
 							switch(timestamp.getMonth()){
 								case 0:
 									timeSince = 'Jan';
@@ -276,14 +296,98 @@
 							const ampmHour = (timestamp.getHours() <= 12) ? (timestamp.getHours()).toString() + ":" + timestamp.getMinutes() : hello;
 							timeSince = ampmHour + ampm;
 						} else if (totalTimePassed > 0) {
-							timeSince = Math.floor(totalTimePassed + ' min');
+							timeSince = Math.floor(totalTimePassed) + ' min';
 						} else {
 							timeSince = 'Now';
 						}
 						return timeSince;
 					}
 					function loadMessage(message, username){
-						if (message.sender != username) {
+						var msg = message.message;
+						console.log(msg);
+						var topMessage = '';
+						var timestamp = new Date(msg.fields.timestamp);
+						if(document.getElementsByClassName("pending-content").length > 0) {
+							console.log('correct top message');
+							topMessage = document.getElementsByClassName("message-row")[1];
+						} else {
+							topMessage = document.getElementsByClassName("message-row")[0];
+						}
+
+						if(topMessage.className.indexOf(msg.fields.sender) == -1) {
+							console.log("Weeeeeird businesss");
+							var messageRow = document.createElement("div");
+
+							var messageContent = document.createElement("div");
+							messageContent.className = "message-content";
+
+							var newMessage = document.createElement("div");
+							newMessage.className = "message-text";
+							newMessage.innerText = msg.fields.content;
+							
+							var messageList = document.createElement("div");
+							messageList.className = "message-list";
+							
+							var messageListTime = document.createElement("div");
+							messageListTime.className = "message-time";
+							messageListTime.innerText = handleTime(timestamp);
+							if (message.sender == username) {
+								messageRow.className = "message-row sent-message " + msg.fields.sender;
+								newMessage.style = "border-radius: 15px 0 15px 15px !important;";
+							} else {
+								messageRow.className = "message-row received-message " + msg.fields.sender;
+								var messageSender = document.createElement("img");
+								messageSender.className = "profile-pic";
+								messageSender.src = "{% static 'th.jpg' %}";
+
+								messageContent.appendChild(messageSender);
+								newMessage.style = "border-radius: 0 15px 15px 15px !important;";
+							}
+							messageList.appendChild(newMessage)
+							messageContent.appendChild(messageList);
+							messageContent.appendChild(messageListTime);
+							messageRow.appendChild(messageContent);
+							document.getElementById('conversation').appendChild(messageRow);
+							console.log(messageRow.className);
+							$('#conversation').prepend(messageRow);
+							if(document.getElementsByClassName("pending-content").length > 0 && document.getElementsByClassName("pending-content")[0].getElementsByClassName("pending")[0].innerHTML == msg.fields.content) {
+								for(element of document.getElementsByClassName("pending-content")){
+									element.remove();
+								}
+							}
+						} else {
+							if(message.sender == username) {
+								if(document.getElementsByClassName("pending-content").length > 0 && document.getElementsByClassName("pending-content")[0].getElementsByClassName("pending")[0].innerHTML == msg.fields.content) {
+									console.log("HIIII");
+									//var sentMessage = document.getElementsByClassName("pending-content")[0].getElementsByClassName("pending")[0];
+									topMessage.getElementsByClassName("message-text")[topMessage.getElementsByClassName("message-text").length - 1].style = '';
+									document.getElementsByClassName("pending-content")[0].getElementsByClassName("pending")[0].style = "border-radius: 15px 0 15px 15px !important;";
+									topMessage.getElementsByClassName("message-list")[0].appendChild(document.getElementsByClassName("pending-content")[0].getElementsByClassName("pending")[0]);
+									for(element of document.getElementsByClassName("pending-content")){
+										element.remove();
+									}
+								} else {
+									console.log("odd businesss");
+									var newMessage = document.createElement("div");
+									newMessage.className = "message-text";
+									newMessage.innerText = msg.fields.content;
+									topMessage.getElementsByClassName("message-text")[topMessage.getElementsByClassName("message-text").length - 1].style = '';
+									newMessage.style = "border-radius: 15px 0 15px 15px !important;";
+									topMessage.getElementsByClassName("message-list")[0].append(newMessage);
+								}
+							} else {
+								console.log("Not super weird businesss");
+								var newMessage = document.createElement("div");
+								newMessage.className = "message-text";
+								newMessage.innerText = msg.fields.content;
+								topMessage.getElementsByClassName("message-text")[0].style = '';
+								newMessage.style = "border-radius: 0 15px 15px 15px !important;";
+								topMessage.getElementsByClassName("message-list")[0].append(newMessage);
+							}
+							topMessage.getElementsByClassName("message-time")[0].innerText = handleTime(timestamp);
+						}
+						/*if (message.sender != username) {
+							
 							msgHtml = '<div class="message-row received-message">\
 								<div class="message-content">\
 									<img src="th.jpg" alt="Katya Schwendeman" class="profile-pic">\
@@ -292,7 +396,9 @@
 							var endOfContainer = '';
 							endOfContainer = timeHtml + timeHtml + timeHtmlEng + containerEnd;
 							$('#conversation').prepend(msgHtml + message.message + msgHtmlEnd + endOfContainer);
-						}
+						} else {
+						
+						}*/
 						$('#recent-message').text(message.message);
 					}
 					function updateChatList(message) {
@@ -397,6 +503,8 @@
 					}
 					function loadChats(message, username, roomName){	
 						$('#conversation').html('');
+						$('#profile-name').text(message.name);
+						$('#profile-username').text(username);
 						pk = message.pk;
 						console.log("...receiving messages")
 						for(var i = 0; i < message.messages.length; i++) {
@@ -416,17 +524,23 @@
 							var leadingMessage = document.createElement("div");
 							leadingMessage.className = "message-text";
 							leadingMessage.innerText = msg.fields.content;
-
+							
+							var messageListTime = document.createElement("div");
+							messageListTime.className = "message-time";
+							var timestamp = new Date(msg.fields.timestamp);
+							messageListTime.innerText = handleTime(timestamp);
+							console.log(timestamp);
 							if(msg.fields.sender == pk) {
-								messageRow.className = "message-row sent-message";
+								messageRow.className = "message-row sent-message " + msg.fields.sender;
 								leadingMessage.style = "border-radius: 15px 0 15px 15px !important;";
 							} else {
-								messageRow.className = "message-row received-message";
+								messageRow.className = "message-row received-message " + msg.fields.sender;
 								messageContent.appendChild(messageSender);
 								leadingMessage.style = "border-radius: 0 15px 15px 15px !important;";
 							}
 							try {
 								messageList.appendChild(leadingMessage);
+								
 								var nextMsg = message.messages[i+1];
 								console.log(nextMsg.fields);
 								while(msg.fields.sender == nextMsg.fields.sender) {
@@ -443,10 +557,7 @@
 							catch {
 								console.log("No more messages!");
 							}
-							var messageListTime = document.createElement("div");
-							messageListTime.className = "message-time";
-							var timestamp = new Date(msg.fields.timestamp)
-							messageListTime.innerText = handleTime(timestamp);
+							
 
 							messageContent.appendChild(messageList);
 							messageContent.appendChild(messageListTime);
@@ -503,11 +614,13 @@
 							const chatID = chat.pk;
 							var lastMessage = document.createElement("div");
 							lastMessage.className = "recent-message";
-							lastMessage.innerHTML = message.top_messages[chatID].fields.content;
+							console.log(message.top_messages);
+							console.log(chatID);
+							lastMessage.innerHTML = message.top_messages[chatID].content;
 
 							var lastMessageDate = document.createElement("div");
 							lastMessageDate.className = "message-date";
-							var timestamp = new Date(message.top_messages[chatID].fields.timestamp)
+							var timestamp = new Date(message.top_messages[chatID].timestamp)
 							//console.log(timestamp)
 							lastMessageDate.innerHTML = handleTime(timestamp);
 
@@ -528,6 +641,7 @@
 						
 					}
 					function loadChatMessages(message, username){
+						chatSocket.stopFetching();
 						pk = message.pk;
 						console.log("...receiving messages")
 						for(var i = 0; i < message.messages.length; i++) {
@@ -549,10 +663,10 @@
 							leadingMessage.innerText = msg.fields.content;
 
 							if(msg.fields.sender == pk) {
-								messageRow.className = "message-row sent-message";
+								messageRow.className = "message-row sent-message " + msg.fields.sender;
 								leadingMessage.style = "border-radius: 15px 0 15px 15px !important;";
 							} else {
-								messageRow.className = "message-row received-message";
+								messageRow.className = "message-row received-message " + msg.fields.sender;
 								messageContent.appendChild(messageSender);
 								leadingMessage.style = "border-radius: 0 15px 15px 15px !important;";
 							}
@@ -619,13 +733,18 @@
 						$('#chat-title').html('');
 						console.log('switching...');
 					}
+					var middle = $("#conversation").height()/2;
 					$("#conversation").scroll(function(){
-						
+						console.log("YO");
 						var position = $("#conversation").scrollTop();
 						//console.log("position" + position);
-						var middle = $("#conversation").height()/2;
+						var middle = (document.getElementById("conversation").scrollHeight)/2.6;
+						middle *= chatSocket.threshold;
+						console.log(middle);
+						console.log(position);
 						//console.log("middle" + middle);
 						//console.log("position: " + pos);
+						//console.log(position <= -middle);
 						if( position <= -middle && !chatSocket.fetchingMessages){
 							console.log("fetch more messages");
 							chatSocket.fetchMessages()
@@ -663,9 +782,9 @@
 							'message': msg,
 						}));*/
 						chatSocket.sendMessage(msg);
-						msgHtml = '<div class="message-row sent-message">\
+						msgHtml = '<div class="message-row sent-message pending-content">\
 									<div class="message-content">\
-										<div class="message-list"><div class="message-text">'
+										<div class="message-list"><div class="message-text pending">'
 						var endOfContainer = '';
 						endOfContainer = timeHtml + timeHtml + timeHtmlEng + containerEnd;
 						$('#conversation').prepend(msgHtml + msg + msgHtmlEnd + endOfContainer);

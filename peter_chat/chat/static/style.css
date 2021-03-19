@@ -85,6 +85,97 @@ html{
 	padding: 10px 10px 10px 5px;
 }
 
+#profile {
+	position: relative;
+}
+
+#prof-but {
+	top: 50%;
+	transform: translateY(-50%);
+	position: relative;
+	border-radius: 9999px;
+	z-index: 0;
+	
+}
+
+#prof-but:hover {
+	background: rgba(22, 22, 22, 0.8); 
+}
+#profile > div > li{
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	font-size: 1rem !important;
+	padding-left: 16px;
+    padding-right: 16px;
+	padding-top: 12px;
+	padding-bottom: 12px;
+	outline-style: none;
+	list-style: none;
+	color: white;
+}
+
+#profile > div > li > div{
+	-webkit-box-direction: normal;
+    -webkit-box-orient: horizontal;
+    flex-direction: row;
+	align-items: stretch;
+	display: flex;
+	position: relative;
+}
+
+#profile-names {
+	flex-basis: 0px;
+	flex-grow: 1;
+	align-items: stretch;
+	position: relative;
+	-webkit-box-pack: center;
+    justify-content: center;
+	z-index: 9999;
+}
+#profile > div > li > div > div{
+	flex-basis: 50px;
+	-webkit-box-pack: center;
+    justify-content: center;
+	-webkit-box-flex: 0;
+    flex-grow: 0;
+	position: relative;
+}
+.pic-holder {
+	margin-right: 12px;
+}
+#my-pic {
+	height: 48px;
+	width: 48px;
+	border-radius: 50%;
+	-webkit-box-flex: 0;
+    flex-grow: 0;
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	object-fit: cover;
+}
+
+#profile-name {
+	grid-column: span 2;
+	margin-top: 2px;
+	/*font-size: 1.1rem;*/
+	white-space: nowrap;
+	overflow-x: hidden;
+	text-overflow: ellipsis;
+}
+
+#profile-username {
+	grid-column: span 2;
+	font-size: 0.9rem;
+	white-space: nowrap;
+	overflow-x: hidden;
+	text-overflow: ellipsis;
+}
+
 .chat {
 	border-bottom: 1px solid #803790;
 	color: white;
@@ -134,8 +225,8 @@ html{
 	grid-area: profile;
 	/*background: #3FEE5F;*/
 	background-color: transparent;
-	box-shadow: 0px -1px 3px -3px #803790;
-	border-top: 1px solid #803790;
+	box-shadow: 0px -1px 3px -3px #732E6C;
+	border-top: 1px solid #732E6C;
 	padding-top: 1px;
 	/*background: #3EE55D;*/
 }
@@ -165,7 +256,7 @@ html{
 	flex-direction: column-reverse;
 	padding: 0 12px;
 	overflow-y: scroll;
-	/*border-bottom: 1px solid #dbdbdb;*/
+	border-bottom: 1px solid #dbdbdb;
 }
 
 .message-row{
