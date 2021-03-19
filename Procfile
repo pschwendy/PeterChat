@@ -1,0 +1,1 @@
+web: pyhton3 peter_chat/manage.py runserver 0.0.0.0:$PORT

@@ -39,8 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'chat',
     'channels',
-    'dajaxice',
-    'dajax'
 ]
 
 MIDDLEWARE = [
@@ -88,6 +86,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'peterchatdb',
+        'USER': 'peter',
+        'PASSWORD': 'i.love.madame.kashyap'
     }
 }
 
